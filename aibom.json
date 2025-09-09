@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:c96ca2d6-ac60-47c5-a0f6-ffe4815df8af",
+  "serialNumber": "urn:uuid:0358c54e-d4e2-4611-9e94-647470c09e46",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-09T01:14:06.412580+00:00",
+    "timestamp": "2025-09-09T02:20:30.169295+00:00",
     "tools": {
       "components": [
         {
@@ -20,12 +20,12 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/Lakshan2003%2FGemma3-4B-it-financial-customerservice@1.0",
-      "name": "Gemma3-4B-it-financial-customerservice",
+      "bom-ref": "pkg:generic/microsoft%2FDialoGPT-medium@1.0",
+      "name": "DialoGPT-medium",
       "version": "1.0",
       "description": "No description available",
       "copyright": "NOASSERTION",
-      "purl": "pkg:generic/Lakshan2003%2FGemma3-4B-it-financial-customerservice@1.0"
+      "purl": "pkg:generic/microsoft%2FDialoGPT-medium@1.0"
     },
     "properties": [
       {
@@ -34,56 +34,57 @@
       },
       {
         "name": "suppliedBy",
-        "value": "Lakshan2003"
+        "value": "microsoft"
       }
     ]
   },
   "components": [
     {
       "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/Lakshan2003/Gemma3-4B-it-financial-customerservice@1.0",
-      "name": "Gemma3-4B-it-financial-customerservice",
+      "bom-ref": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "name": "DialoGPT-medium",
       "version": "1.0",
       "description": "No description available",
-      "group": "Lakshan2003",
-      "publisher": "Lakshan2003",
+      "group": "microsoft",
+      "publisher": "microsoft",
       "supplier": {
-        "name": "Lakshan2003",
+        "name": "microsoft",
         "url": [
-          "https://huggingface.co/Lakshan2003"
+          "https://huggingface.co/microsoft"
         ]
       },
       "manufacturer": {
-        "name": "Lakshan2003",
+        "name": "microsoft",
         "url": [
-          "https://huggingface.co/Lakshan2003"
+          "https://huggingface.co/microsoft"
         ]
       },
       "authors": [
         {
-          "name": "Lakshan2003"
+          "name": "microsoft"
         }
       ],
       "copyright": "NOASSERTION",
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0",
-            "url": "https://spdx.org/licenses/Apache-2.0.html"
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://spdx.org/licenses/MIT"
           }
         }
       ],
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/Lakshan2003/Gemma3-4B-it-financial-customerservice"
+          "url": "https://huggingface.co/microsoft/DialoGPT-medium"
         }
       ],
-      "purl": "pkg:huggingface/Lakshan2003/Gemma3-4B-it-financial-customerservice@1.0",
+      "purl": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
       "modelCard": {
         "modelParameters": {
           "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
+          "modelArchitecture": "GPT2LMHeadModel",
           "task": "text-generation",
           "inputs": [
             {
@@ -107,7 +108,7 @@
           },
           {
             "name": "serialNumber",
-            "value": "urn:uuid:Lakshan2003-Gemma3-4B-it-financial-customerservice"
+            "value": "urn:uuid:microsoft-DialoGPT-medium"
           },
           {
             "name": "version",
@@ -119,7 +120,7 @@
           },
           {
             "name": "suppliedBy",
-            "value": "Lakshan2003"
+            "value": "microsoft"
           },
           {
             "name": "typeOfModel",
@@ -127,11 +128,11 @@
           },
           {
             "name": "downloadLocation",
-            "value": "https://huggingface.co/Lakshan2003/Gemma3-4B-it-financial-customerservice/tree/main"
+            "value": "https://huggingface.co/microsoft/DialoGPT-medium/tree/main"
           },
           {
             "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/Lakshan2003/Gemma3-4B-it-financial-customerservice\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/Lakshan2003/Gemma3-4B-it-financial-customerservice/tree/main\", \"comment\": \"Model files\"}]"
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-medium\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-medium/tree/main\", \"comment\": \"Model files\"}]"
           }
         ],
         "quantitativeAnalysis": {
@@ -140,11 +141,18 @@
       }
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "dependsOn": [
+        "pkg:huggingface/microsoft/DialoGPT-base@1.0"
+      ]
+    }
+  ],
   "externalReferences": [
     {
       "type": "distribution",
-      "url": "https://huggingface.co/Lakshan2003/Gemma3-4B-it-financial-customerservice"
+      "url": "https://huggingface.co/microsoft/DialoGPT-medium"
     }
   ]
 }
