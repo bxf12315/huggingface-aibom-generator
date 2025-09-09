@@ -1,5 +1,8 @@
 pub mod models;
 pub mod generator;
+pub mod model_analyzer;
+pub mod license_handler;
+pub mod component_generator;
 
 pub use models::*;
 pub use generator::*;

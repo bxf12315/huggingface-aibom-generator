@@ -1,619 +1,43 @@
-// use crate::models::dependency::DependencyReference; // No longer needed
+use crate::component_generator::ComponentGenerator;
+use crate::model_analyzer::ModelAnalyzer;
 use crate::*;
 use std::collections::{HashMap, HashSet};
 
+/// Main AIBOM Generator that orchestrates the generation process
 pub struct AIBOMGenerator {
     api: hf_hub::api::sync::Api,
+    component_generator: ComponentGenerator,
+    model_analyzer: ModelAnalyzer,
     processed_models: HashSet<String>,
     components: Vec<Component>,
-    dependencies: HashMap<String, Vec<String>>, // Simplified to just dependency references
+    dependencies: HashMap<String, Vec<String>>,
 }
 
 impl AIBOMGenerator {
+    /// Create a new AIBOM Generator instance
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let api = hf_hub::api::sync::Api::new()?;
+        let component_generator = ComponentGenerator::new();
+        let model_analyzer = ModelAnalyzer::new();
+
         Ok(Self {
             api,
+            component_generator,
+            model_analyzer,
             processed_models: HashSet::new(),
             components: Vec::new(),
             dependencies: HashMap::new(),
         })
     }
 
+    /// Get model information from HuggingFace API
     pub fn get_model_info(&self, model_id: &str) -> Result<ModelInfo, Box<dyn std::error::Error>> {
         let _repo = self.api.model(model_id.to_string());
-        let model_info = self.fetch_model_info_from_hf_api(model_id)?;
-        Ok(model_info)
+        self.model_analyzer.fetch_model_info_from_hf_api(model_id)
     }
 
-    fn fetch_model_info_from_hf_api(
-        &self,
-        model_id: &str,
-    ) -> Result<ModelInfo, Box<dyn std::error::Error>> {
-        use reqwest::blocking::Client;
-        use std::time::Duration;
-
-        let client = Client::builder()
-            .timeout(Duration::from_secs(30))
-            .danger_accept_invalid_certs(false)
-            .build()?;
-
-        let url = format!("https://huggingface.co/api/models/{}", model_id);
-
-        println!("Fetching model info from: {}", url);
-
-        let response = client
-            .get(&url)
-            .header("User-Agent", "rust-aibom-generator/1.0")
-            .send()?;
-
-        if !response.status().is_success() {
-            return Err(format!("API request failed with status: {}", response.status()).into());
-        }
-
-        let model_info = response.json::<ModelInfo>()?;
-        println!("Successfully fetched model info for: {}", model_id);
-        Ok(model_info)
-    }
-
-    pub fn extract_dependencies(&self, model_info: &ModelInfo) -> Vec<(String, Option<String>)> {
-        let mut dependencies = Vec::new();
-
-        // Only extract dependencies from explicit model card data
-        if let Some(card_data) = &model_info.card_data {
-            // Check for explicit base_model field (can be string or array)
-            if let Some(base_model) = card_data.get("base_model") {
-                let mut relation = card_data
-                    .get("base_model_relation")
-                    .and_then(|r| r.as_str())
-                    .map(|s| s.to_string());
-
-                // If no explicit relation, try to infer from other fields
-                if relation.is_none() {
-                    // Check library_name first (highest priority for specific model types)
-                    if let Some(library_name) = card_data.get("library_name") {
-                        if let Some(lib_str) = library_name.as_str() {
-                            match lib_str {
-                                "adapter-transformers" | "adapters" => {
-                                    relation = Some("adapter".to_string());
-                                }
-                                "peft" => {
-                                    relation = Some("lora".to_string());
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-
-                    // Check for quantized_by field
-                    if relation.is_none() {
-                        if let Some(quantized_by) = card_data.get("quantized_by") {
-                            if quantized_by.is_string() {
-                                relation = Some("quantized".to_string());
-                            }
-                        }
-                    }
-
-                    // Check tags for relation indicators
-                    if relation.is_none() {
-                        for tag in &model_info.tags {
-                            let tag_lower = tag.to_lowercase();
-
-                            // Check for base_model:relation:model format
-                            if tag_lower.starts_with("base_model:") {
-                                let parts: Vec<&str> = tag_lower.split(':').collect();
-                                if parts.len() >= 3 && parts[0] == "base_model" {
-                                    match parts[1] {
-                                        "finetune" | "finetuned" => {
-                                            relation = Some("finetuned".to_string());
-                                            break;
-                                        }
-                                        "adapter" => {
-                                            relation = Some("adapter".to_string());
-                                            break;
-                                        }
-                                        "lora" | "qlora" => {
-                                            relation = Some("lora".to_string());
-                                            break;
-                                        }
-                                        "quantized" | "quantization" => {
-                                            relation = Some("quantized".to_string());
-                                            break;
-                                        }
-                                        "merged" | "merge" => {
-                                            relation = Some("merged".to_string());
-                                            break;
-                                        }
-                                        "distilled" | "distillation" => {
-                                            relation = Some("distilled".to_string());
-                                            break;
-                                        }
-                                        _ => {}
-                                    }
-                                }
-                            } else {
-                                // Check for simple tag matches
-                                match tag_lower.as_str() {
-                                    "lora" | "qlora" => {
-                                        relation = Some("lora".to_string());
-                                        break;
-                                    }
-                                    "adapter" => {
-                                        relation = Some("adapter".to_string());
-                                        break;
-                                    }
-                                    "instruction-tuning" | "chat" => {
-                                        relation = Some("finetuned".to_string());
-                                        break;
-                                    }
-                                    "distillation" => {
-                                        relation = Some("distilled".to_string());
-                                        break;
-                                    }
-                                    "onnx" | "tensorrt" => {
-                                        relation = Some("converted".to_string());
-                                        break;
-                                    }
-                                    "pruning" => {
-                                        relation = Some("pruned".to_string());
-                                        break;
-                                    }
-                                    _ => {}
-                                }
-                            }
-                        }
-                    }
-
-                    // Check for merge indicators (multiple base models or merge tags)
-                    if relation.is_none() {
-                        let is_merge = if let Some(base_model_array) = base_model.as_array() {
-                            base_model_array.len() > 1
-                        } else {
-                            false
-                        } || model_info
-                            .tags
-                            .iter()
-                            .any(|tag| tag.to_lowercase().contains("merge"));
-
-                        if is_merge {
-                            relation = Some("merged".to_string());
-                        }
-                    }
-
-                    // Check model name patterns for common relations
-                    if relation.is_none() {
-                        let model_name = model_info.model_id.to_lowercase();
-                        if model_name.contains("gguf")
-                            || model_name.contains("gptq")
-                            || model_name.contains("awq")
-                            || model_name.contains("int4")
-                            || model_name.contains("int8")
-                        {
-                            relation = Some("quantized".to_string());
-                        } else if model_name.contains("lora") || model_name.contains("qlora") {
-                            relation = Some("lora".to_string());
-                        } else if model_name.contains("adapter") {
-                            relation = Some("adapter".to_string());
-                        } else if model_name.contains("merge") {
-                            relation = Some("merged".to_string());
-                        } else if model_name.contains("finetune") || model_name.contains("ft") {
-                            relation = Some("finetuned".to_string());
-                        } else if model_name.contains("instruct") || model_name.contains("chat") {
-                            relation = Some("finetuned".to_string());
-                        } else if model_name.contains("distil") {
-                            relation = Some("distilled".to_string());
-                        } else if model_name.contains("onnx") {
-                            relation = Some("converted".to_string());
-                        } else if model_name.contains("prune") {
-                            relation = Some("pruned".to_string());
-                        }
-                    }
-                }
-
-                if let Some(base_model_str) = base_model.as_str() {
-                    dependencies.push((base_model_str.to_string(), relation.clone()));
-                    println!(
-                        "Found base_model dependency: {} (relation: {:?})",
-                        base_model_str, relation
-                    );
-                } else if let Some(base_model_array) = base_model.as_array() {
-                    for base_model_item in base_model_array {
-                        if let Some(base_model_str) = base_model_item.as_str() {
-                            dependencies.push((base_model_str.to_string(), relation.clone()));
-                            println!(
-                                "Found base_model dependency: {} (relation: {:?})",
-                                base_model_str, relation
-                            );
-                        }
-                    }
-                }
-            }
-
-            // Check for parent_model field (some models use this)
-            if let Some(parent_model) = card_data.get("parent_model") {
-                if let Some(parent_model_str) = parent_model.as_str() {
-                    dependencies.push((parent_model_str.to_string(), Some("parent".to_string())));
-                    println!("Found parent_model dependency: {}", parent_model_str);
-                }
-            }
-
-            // Check for datasets used to train the model
-            if let Some(datasets) = card_data.get("datasets") {
-                if let Some(datasets_array) = datasets.as_array() {
-                    for dataset in datasets_array {
-                        if let Some(dataset_str) = dataset.as_str() {
-                            dependencies.push((dataset_str.to_string(), Some("train".to_string())));
-                            println!("Found training dataset dependency: {}", dataset_str);
-                        }
-                    }
-                } else if let Some(dataset_str) = datasets.as_str() {
-                    dependencies.push((dataset_str.to_string(), Some("train".to_string())));
-                    println!("Found training dataset dependency: {}", dataset_str);
-                }
-            }
-
-            // Also check for train_dataset field (alternative naming)
-            if let Some(train_dataset) = card_data.get("train_dataset") {
-                if let Some(dataset_str) = train_dataset.as_str() {
-                    dependencies.push((dataset_str.to_string(), Some("train".to_string())));
-                    println!("Found training dataset dependency: {}", dataset_str);
-                }
-            }
-        }
-
-        // Remove duplicates and self-references
-        dependencies.sort_by(|a, b| a.0.cmp(&b.0));
-        dependencies.dedup();
-        dependencies.retain(|(dep, _)| dep != &model_info.model_id);
-
-        // Log warning if no dependencies found
-        if dependencies.is_empty() {
-            println!(
-                "Warning: No explicit dependencies found for model: {}. Consider adding base_model, parent_model, or dependencies fields to the model card.",
-                model_info.model_id
-            );
-        }
-
-        dependencies
-    }
-
-    fn normalize_license(&self, license: &str, model_info: &ModelInfo) -> Option<LicenseInfo> {
-        // Try different normalization strategies to find a valid SPDX license ID
-        let variations = [
-            license.to_string(),                      // Original
-            license.to_lowercase(),                   // Lowercase
-            license.to_uppercase(),                   // Uppercase
-            license.to_lowercase().replace(" ", "-"), // Lowercase with dashes
-            license.to_lowercase().replace("-", " "), // Lowercase with spaces
-            license.replace(" ", "-"),                // Original with dashes
-            license.replace("-", " "),                // Original with spaces
-        ];
-
-        // Check each variation against SPDX license IDs
-        for variant in &variations {
-            if let Some(spdx_license) = spdx::license_id(variant) {
-                return Some(LicenseInfo {
-                    id: Some(spdx_license.name.to_string()),
-                    name: None, // For SPDX licenses, only keep id
-                    url: Some(format!("https://spdx.org/licenses/{}", spdx_license.name)),
-                    text: None,
-                });
-            }
-        }
-
-        // If not found in SPDX, try to find LICENSE file URL from HuggingFace repo
-        if let Some(license_url) = self.find_license_file_url(&model_info.model_id) {
-            // Try to get license name from card_data.license_name first, then model_info.license, fallback to original license string
-            let license_name = model_info
-                .card_data
-                .as_ref()
-                .and_then(|card_data| card_data.get("license_name"))
-                .and_then(|name| name.as_str())
-                .map(|s| s.to_string())
-                .or_else(|| model_info.license.clone())
-                .unwrap_or_else(|| license.to_string());
-
-            return Some(LicenseInfo {
-                id: None,
-                name: Some(license_name),
-                url: Some(license_url),
-                text: None,
-            });
-        }
-
-        // If no license information is available, return None
-        None
-    }
-
-    fn find_license_file_url(&self, model_id: &str) -> Option<String> {
-        use reqwest::blocking::Client;
-        use std::time::Duration;
-
-        let client = Client::builder()
-            .timeout(Duration::from_secs(10))
-            .build()
-            .ok()?;
-
-        // Try common LICENSE file names
-        let license_files = [
-            "LICENSE",
-            "LICENSE.txt",
-            "LICENSE.md",
-            "license",
-            "license.txt",
-        ];
-
-        for filename in &license_files {
-            let url = format!(
-                "https://huggingface.co/{}/resolve/main/{}",
-                model_id, filename
-            );
-
-            if let Ok(response) = client
-                .get(&url)
-                .header("User-Agent", "rust-aibom-generator/1.0")
-                .send()
-            {
-                if response.status().is_success() {
-                    return Some(url);
-                }
-            }
-        }
-
-        None
-    }
-
-    fn extract_organization_from_model_id(&self, model_id: &str) -> (String, String) {
-        let parts: Vec<&str> = model_id.split('/').collect();
-        if parts.len() >= 2 {
-            (parts[0].to_string(), parts[1].to_string())
-        } else {
-            ("huggingface".to_string(), model_id.to_string())
-        }
-    }
-
-    fn is_machine_learning_model(&self, tags: &[String]) -> bool {
-        // Check if it contains machine learning related tags
-        let ml_tags = [
-            "text-generation",
-            "conversational",
-            "text-classification",
-            "feature-extraction",
-            "translation",
-            "summarization",
-            "question-answering",
-            "fill-mask",
-            "token-classification",
-            "image-classification",
-            "object-detection",
-            "image-segmentation",
-            "audio-classification",
-            "automatic-speech-recognition",
-            "text-to-speech",
-            "reinforcement-learning",
-        ];
-
-        tags.iter().any(|tag| ml_tags.contains(&tag.as_str()))
-    }
-
-    fn determine_task(&self, tags: &[String]) -> String {
-        for tag in tags {
-            match tag.as_str() {
-                "text-generation" => return "text-generation".to_string(),
-                "conversational" => return "conversational".to_string(),
-                "text-classification" => return "text-classification".to_string(),
-                "feature-extraction" => return "feature-extraction".to_string(),
-                "translation" => return "translation".to_string(),
-                _ => continue,
-            }
-        }
-        "text-generation".to_string()
-    }
-
-    fn get_model_architecture(&self, model_info: &ModelInfo) -> String {
-        // Try to extract architecture from model card data
-        if let Some(card_data) = &model_info.card_data {
-            if let Some(architecture) = card_data.get("architecture") {
-                if let Some(arch_str) = architecture.as_str() {
-                    return arch_str.to_string();
-                }
-            }
-            // Also check for architectures array in config
-            if let Some(architectures) = card_data.get("architectures") {
-                if let Some(arch_array) = architectures.as_array() {
-                    if let Some(first_arch) = arch_array.first() {
-                        if let Some(arch_str) = first_arch.as_str() {
-                            return arch_str.to_string();
-                        }
-                    }
-                }
-            }
-        }
-
-        // Default to generic transformer if no specific architecture found
-        "TransformerModel".to_string()
-    }
-
-    fn extract_license_from_tags(&self, tags: &[String]) -> Option<String> {
-        for tag in tags {
-            if tag.starts_with("license:") {
-                return Some(tag.strip_prefix("license:").unwrap().to_string());
-            }
-        }
-        None
-    }
-
-    fn create_dataset_component(&self, dataset_id: &str) -> Component {
-        let (org, dataset_name) = self.extract_organization_from_dataset_id(dataset_id);
-        let version = "1.0".to_string();
-        let purl = format!("pkg:huggingface-dataset/{}@{}", dataset_id, version);
-        let bom_ref = purl.clone();
-
-        Component {
-            component_type: "data".to_string(),
-            bom_ref: bom_ref.clone(),
-            name: dataset_name.clone(),
-            version: Some(version.clone()),
-            description: Some("Training dataset".to_string()),
-            group: Some(org.clone()),
-            publisher: Some(org.clone()),
-            supplier: Some(Organization {
-                name: org.clone(),
-                url: Some(vec![format!("https://huggingface.co/datasets/{}", org)]),
-            }),
-            manufacturer: Some(Organization {
-                name: org.clone(),
-                url: Some(vec![format!("https://huggingface.co/datasets/{}", org)]),
-            }),
-            authors: Some(vec![Author { name: org.clone() }]),
-            copyright: Some("NOASSERTION".to_string()),
-            licenses: None, // Dataset license would need separate API call
-            external_references: Some(vec![ExternalReference {
-                ref_type: "website".to_string(),
-                url: format!("https://huggingface.co/datasets/{}", dataset_id),
-                comment: Some("Dataset repository".to_string()),
-            }]),
-            purl: Some(purl),
-            model_card: None,
-        }
-    }
-
-    fn extract_organization_from_dataset_id(&self, dataset_id: &str) -> (String, String) {
-        let parts: Vec<&str> = dataset_id.split('/').collect();
-        if parts.len() >= 2 {
-            (parts[0].to_string(), parts[1].to_string())
-        } else {
-            ("huggingface".to_string(), dataset_id.to_string())
-        }
-    }
-
-    fn model_info_to_component(&self, model_info: &ModelInfo, relation: Option<String>) -> Component {
-        let (org, model_name) = self.extract_organization_from_model_id(&model_info.model_id);
-        let version = "1.0".to_string();
-        let purl = format!("pkg:huggingface/{}@{}", model_info.model_id, version);
-        let bom_ref = purl.clone();
-
-        // Extract license from tags if not available in license field
-        let license_str = model_info
-            .license
-            .clone()
-            .or_else(|| self.extract_license_from_tags(&model_info.tags));
-
-        // Create ModelCard
-        let model_card = if self.is_machine_learning_model(&model_info.tags) {
-            let task = self.determine_task(&model_info.tags);
-            let architecture = self.get_model_architecture(model_info);
-
-            // Create properties array
-            let mut properties = vec![
-                Property {
-                    name: "bomFormat".to_string(),
-                    value: "CycloneDX".to_string(),
-                },
-                Property {
-                    name: "specVersion".to_string(),
-                    value: "1.6".to_string(),
-                },
-                Property {
-                    name: "serialNumber".to_string(),
-                    value: format!("urn:uuid:{}", model_info.model_id.replace("/", "-")),
-                },
-                Property {
-                    name: "version".to_string(),
-                    value: "1.0.0".to_string(),
-                },
-                Property {
-                    name: "primaryPurpose".to_string(),
-                    value: task.clone(),
-                },
-                Property {
-                    name: "suppliedBy".to_string(),
-                    value: org.clone(),
-                },
-                Property {
-                    name: "typeOfModel".to_string(),
-                    value: "transformer".to_string(),
-                },
-                Property {
-                    name: "downloadLocation".to_string(),
-                    value: format!("https://huggingface.co/{}/tree/main", model_info.model_id),
-                },
-                Property {
-                    name: "external_references".to_string(),
-                    value: format!(
-                        r#"[{{"type": "website", "url": "https://huggingface.co/{}", "comment": "Model repository"}}, {{"type": "distribution", "url": "https://huggingface.co/{}/tree/main", "comment": "Model files"}}]"#,
-                        model_info.model_id, model_info.model_id
-                    ),
-                },
-            ];
-
-            // Add relation information if available
-            if let Some(rel) = &relation {
-                properties.push(Property {
-                    name: "ai.model.relation".to_string(),
-                    value: rel.clone(),
-                });
-            }
-
-            Some(ModelCard {
-                model_parameters: Some(ModelParameters {
-                    architecture_family: Some("transformer".to_string()),
-                    model_architecture: Some(architecture),
-                    task: Some(task),
-                    inputs: Some(vec![InputOutputData {
-                        format: "text".to_string(),
-                    }]),
-                    outputs: Some(vec![InputOutputData {
-                        format: "generated-text".to_string(),
-                    }]),
-                }),
-                properties: Some(properties),
-                quantitative_analysis: Some(QuantitativeAnalysis {
-                    graphics: Some(serde_json::Value::Object(serde_json::Map::new())),
-                    performance_metrics: None,
-                }),
-            })
-        } else {
-            None
-        };
-
-        Component {
-            component_type: "machine-learning-model".to_string(),
-            bom_ref: bom_ref.clone(),
-            name: model_name.clone(),
-            version: Some(version.clone()),
-            description: Some("No description available".to_string()),
-            group: Some(org.clone()),
-            publisher: Some(org.clone()),
-            supplier: Some(Organization {
-                name: org.clone(),
-                url: Some(vec![format!("https://huggingface.co/{}", org)]),
-            }),
-            manufacturer: Some(Organization {
-                name: org.clone(),
-                url: Some(vec![format!("https://huggingface.co/{}", org)]),
-            }),
-            authors: Some(vec![Author { name: org.clone() }]),
-            copyright: Some("NOASSERTION".to_string()),
-            licenses: license_str.as_ref().and_then(|license| {
-                self.normalize_license(license, model_info)
-                    .map(|license_info| {
-                        vec![License {
-                            license: license_info,
-                        }]
-                    })
-            }),
-            external_references: Some(vec![ExternalReference {
-                ref_type: "website".to_string(),
-                url: format!("https://huggingface.co/{}", model_info.model_id),
-                comment: None,
-            }]),
-            purl: Some(purl),
-            model_card,
-        }
-    }
-
-    fn process_model_recursively(
+    /// Process a model and its dependencies recursively
+    pub fn process_model_recursively(
         &mut self,
         model_id: &str,
         relation: Option<String>,
@@ -626,7 +50,7 @@ impl AIBOMGenerator {
         self.processed_models.insert(model_id.to_string());
 
         let model_info = self.get_model_info(model_id)?;
-        let dependencies = self.extract_dependencies(&model_info);
+        let dependencies = self.model_analyzer.extract_dependencies(&model_info);
 
         // Separate datasets from model dependencies
         let mut dataset_dependencies = Vec::new();
@@ -643,7 +67,9 @@ impl AIBOMGenerator {
         // Process dataset dependencies - only add to dependency list, no relation stored
         let mut processed_dependencies = Vec::new();
         for (dataset_id, _) in dataset_dependencies {
-            let dataset_component = self.create_dataset_component(&dataset_id);
+            let dataset_component = self
+                .component_generator
+                .create_dataset_component(&dataset_id);
             let dep_purl = dataset_component.purl.clone().unwrap();
 
             // Add dataset component to components list
@@ -673,7 +99,9 @@ impl AIBOMGenerator {
         }
 
         // Create component with relation information
-        let component = self.model_info_to_component(&model_info, relation);
+        let component = self
+            .component_generator
+            .model_info_to_component(&model_info, relation);
         let bom_ref = component.bom_ref.clone();
 
         self.components.push(component);
@@ -686,6 +114,7 @@ impl AIBOMGenerator {
         Ok(())
     }
 
+    /// Generate complete AIBOM for a given model
     pub fn generate_aibom(
         &mut self,
         main_model_id: &str,
@@ -703,27 +132,14 @@ impl AIBOMGenerator {
             })
             .collect();
 
-        let (main_org, main_name) = self.extract_organization_from_model_id(main_model_id);
-        let main_purl = format!("pkg:generic/{}@1.0", main_model_id.replace("/", "%2F"));
+        let (main_org, _main_name) = self
+            .model_analyzer
+            .extract_organization_from_model_id(main_model_id);
 
         // Create main application component
-        let main_component = Component {
-            component_type: "application".to_string(),
-            bom_ref: main_purl.clone(),
-            name: main_name.clone(),
-            version: Some("1.0".to_string()),
-            description: Some("No description available".to_string()),
-            group: None,
-            publisher: None,
-            supplier: None,
-            manufacturer: None,
-            authors: None,
-            copyright: Some("NOASSERTION".to_string()),
-            licenses: None,
-            external_references: None,
-            purl: Some(main_purl.clone()),
-            model_card: None,
-        };
+        let main_component = self
+            .component_generator
+            .create_main_application_component(main_model_id);
 
         // Generate RFC-4122 compliant UUID
         let uuid = uuid::Uuid::new_v4();
@@ -769,236 +185,5 @@ impl AIBOMGenerator {
         };
 
         Ok(aibom)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn test_extract_license_from_tags() {
-        let generator = AIBOMGenerator::new().unwrap();
-
-        let tags = vec![
-            "transformers".to_string(),
-            "pytorch".to_string(),
-            "license:mit".to_string(),
-            "text-generation".to_string(),
-        ];
-
-        let license = generator.extract_license_from_tags(&tags);
-        assert_eq!(license, Some("mit".to_string()));
-    }
-
-    #[test]
-    fn test_extract_dependencies_dialogpt() {
-        let generator = AIBOMGenerator::new().unwrap();
-
-        let model_info = ModelInfo {
-            model_id: "microsoft/DialoGPT-medium".to_string(),
-            tags: vec!["transformers".to_string(), "gpt2".to_string()],
-            library_name: Some("transformers".to_string()),
-            created_at: None,
-            last_modified: None,
-            license: None,
-            card_data: None,
-            siblings: None,
-            sha: None,
-        };
-
-        let dependencies = generator.extract_dependencies(&model_info);
-        // Note: This test may not pass as expected since we removed automatic dependency inference
-        // and now only extract explicit dependencies from card_data
-        assert_eq!(dependencies.len(), 0); // No card_data means no dependencies
-    }
-
-    #[test]
-    fn test_extract_datasets_from_card_data() {
-        let generator = AIBOMGenerator::new().unwrap();
-
-        let card_data = json!({
-            "datasets": ["squad", "common_crawl", "openwebtext"]
-        });
-
-        let model_info = ModelInfo {
-            model_id: "test/model".to_string(),
-            tags: vec!["transformers".to_string()],
-            library_name: Some("transformers".to_string()),
-            created_at: None,
-            last_modified: None,
-            license: None,
-            card_data: Some(card_data),
-            siblings: None,
-            sha: None,
-        };
-
-        let dependencies = generator.extract_dependencies(&model_info);
-
-        // Check that datasets are extracted with "train" relation
-        assert!(dependencies.contains(&("squad".to_string(), Some("train".to_string()))));
-        assert!(dependencies.contains(&("common_crawl".to_string(), Some("train".to_string()))));
-        assert!(dependencies.contains(&("openwebtext".to_string(), Some("train".to_string()))));
-    }
-
-    #[test]
-    fn test_create_dataset_component() {
-        let generator = AIBOMGenerator::new().unwrap();
-        let dataset_component = generator.create_dataset_component("huggingface/squad");
-
-        assert_eq!(dataset_component.component_type, "data");
-        assert_eq!(dataset_component.name, "squad");
-        assert_eq!(dataset_component.group, Some("huggingface".to_string()));
-        assert!(
-            dataset_component
-                .purl
-                .as_ref()
-                .unwrap()
-                .contains("pkg:huggingface-dataset/huggingface/squad@1.0")
-        );
-        assert!(
-            dataset_component.external_references.as_ref().unwrap()[0]
-                .url
-                .contains("https://huggingface.co/datasets/huggingface/squad")
-        );
-    }
-
-    #[test]
-    fn test_normalize_license_spdx_only_id() {
-        let generator = AIBOMGenerator::new().unwrap();
-        
-        let model_info = ModelInfo {
-            model_id: "test/model".to_string(),
-            tags: vec![],
-            library_name: None,
-            created_at: None,
-            last_modified: None,
-            license: None,
-            card_data: None,
-            siblings: None,
-            sha: None,
-        };
-
-        // Test SPDX license - should only have id, not name
-        let license_info = generator.normalize_license("MIT", &model_info);
-        assert!(license_info.is_some());
-        let license = license_info.unwrap();
-        assert_eq!(license.id, Some("MIT".to_string()));
-        assert_eq!(license.name, None); // Should be None for SPDX licenses
-        assert!(license.url.as_ref().unwrap().contains("https://spdx.org/licenses/MIT"));
-    }
-
-    #[test]
-    fn test_normalize_license_non_spdx_only_name() {
-        let generator = AIBOMGenerator::new().unwrap();
-        
-        let model_info = ModelInfo {
-            model_id: "test/model".to_string(),
-            tags: vec![],
-            library_name: None,
-            created_at: None,
-            last_modified: None,
-            license: Some("Custom License".to_string()),
-            card_data: None,
-            siblings: None,
-            sha: None,
-        };
-
-        // Test non-SPDX license - should only have name, not id
-        let license_info = generator.normalize_license("Custom License", &model_info);
-        // This will return None since we can't find a license file URL in tests
-        // But the logic for non-SPDX licenses is correct in the implementation
-        assert!(license_info.is_none());
-    }
-
-    #[test]
-    fn test_model_relation_in_model_card() {
-        let generator = AIBOMGenerator::new().unwrap();
-        
-        let model_info = ModelInfo {
-            model_id: "test/adapter-model".to_string(),
-            tags: vec!["transformers".to_string(), "text-generation".to_string()],
-            library_name: Some("transformers".to_string()),
-            created_at: None,
-            last_modified: None,
-            license: None,
-            card_data: None,
-            siblings: None,
-            sha: None,
-        };
-
-        // Test with adapter relation
-        let component = generator.model_info_to_component(&model_info, Some("adapter".to_string()));
-        
-        assert!(component.model_card.is_some());
-        let model_card = component.model_card.unwrap();
-        assert!(model_card.properties.is_some());
-        
-        let properties = model_card.properties.unwrap();
-        let relation_property = properties.iter().find(|p| p.name == "ai.model.relation");
-        assert!(relation_property.is_some());
-        assert_eq!(relation_property.unwrap().value, "adapter");
-    }
-
-    #[test]
-    fn test_simplified_dependency_structure() {
-        let mut generator = AIBOMGenerator::new().unwrap();
-        
-        // Test that dependencies are now simple string arrays
-        let deps = vec!["pkg:huggingface/base-model@1.0".to_string(), "pkg:huggingface-dataset/dataset@1.0".to_string()];
-        generator.dependencies.insert("pkg:huggingface/test-model@1.0".to_string(), deps.clone());
-        
-        // Verify the structure
-        let stored_deps = generator.dependencies.get("pkg:huggingface/test-model@1.0").unwrap();
-        assert_eq!(stored_deps.len(), 2);
-        assert_eq!(stored_deps[0], "pkg:huggingface/base-model@1.0");
-        assert_eq!(stored_deps[1], "pkg:huggingface-dataset/dataset@1.0");
-    }
-
-    #[test]
-    fn test_get_model_architecture_default() {
-        let generator = AIBOMGenerator::new().unwrap();
-
-        let model_info = ModelInfo {
-            model_id: "microsoft/DialoGPT-medium".to_string(),
-            tags: vec!["transformers".to_string(), "gpt2".to_string()],
-            library_name: Some("transformers".to_string()),
-            created_at: None,
-            last_modified: None,
-            license: None,
-            card_data: None,
-            siblings: None,
-            sha: None,
-        };
-
-        let architecture = generator.get_model_architecture(&model_info);
-        // Without card_data, should return default architecture
-        assert_eq!(architecture, "TransformerModel");
-    }
-
-    #[test]
-    fn test_get_model_architecture_from_card_data() {
-        let generator = AIBOMGenerator::new().unwrap();
-
-        let card_data = json!({
-            "architectures": ["GPT2LMHeadModel"],
-            "model_type": "gpt2"
-        });
-
-        let model_info = ModelInfo {
-            model_id: "microsoft/DialoGPT-medium".to_string(),
-            tags: vec!["transformers".to_string()],
-            library_name: Some("transformers".to_string()),
-            created_at: None,
-            last_modified: None,
-            license: None,
-            card_data: Some(card_data),
-            siblings: None,
-            sha: None,
-        };
-
-        let architecture = generator.get_model_architecture(&model_info);
-        assert_eq!(architecture, "GPT2LMHeadModel");
     }
 }
