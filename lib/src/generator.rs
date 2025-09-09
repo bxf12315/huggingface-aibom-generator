@@ -254,7 +254,7 @@ impl AIBOMGenerator {
         dependencies
     }
 
-    fn normalize_license(&self, license: &str, model_id: &str) -> Option<LicenseInfo> {
+    fn normalize_license(&self, license: &str, model_info: &ModelInfo) -> Option<LicenseInfo> {
         // Try different normalization strategies to find a valid SPDX license ID
         let variations = [
             license.to_string(),                      // Original
@@ -278,13 +278,23 @@ impl AIBOMGenerator {
             }
         }
 
-        // If not found in SPDX, try to read LICENSE file from HuggingFace repo
-        if let Ok(license_text) = self.fetch_license_file(model_id) {
+        // If not found in SPDX, try to find LICENSE file URL from HuggingFace repo
+        if let Some(license_url) = self.find_license_file_url(&model_info.model_id) {
+            // Try to get license name from card_data.license_name first, then model_info.license, fallback to original license string
+            let license_name = model_info
+                .card_data
+                .as_ref()
+                .and_then(|card_data| card_data.get("license_name"))
+                .and_then(|name| name.as_str())
+                .map(|s| s.to_string())
+                .or_else(|| model_info.license.clone())
+                .unwrap_or_else(|| license.to_string());
+
             return Some(LicenseInfo {
                 id: None,
-                name: Some(license.to_string()),
-                url: None,
-                text: Some(license_text),
+                name: Some(license_name),
+                url: Some(license_url),
+                text: None,
             });
         }
 
@@ -292,11 +302,14 @@ impl AIBOMGenerator {
         None
     }
 
-    fn fetch_license_file(&self, model_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+    fn find_license_file_url(&self, model_id: &str) -> Option<String> {
         use reqwest::blocking::Client;
         use std::time::Duration;
 
-        let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
+        let client = Client::builder()
+            .timeout(Duration::from_secs(10))
+            .build()
+            .ok()?;
 
         // Try common LICENSE file names
         let license_files = [
@@ -319,21 +332,12 @@ impl AIBOMGenerator {
                 .send()
             {
                 if response.status().is_success() {
-                    if let Ok(text) = response.text() {
-                        // Basic validation that this looks like a license file
-                        if text.len() > 50
-                            && (text.to_lowercase().contains("license")
-                                || text.to_lowercase().contains("copyright")
-                                || text.to_lowercase().contains("permission"))
-                        {
-                            return Ok(text);
-                        }
-                    }
+                    return Some(url);
                 }
             }
         }
 
-        Err("No LICENSE file found".into())
+        None
     }
 
     fn extract_organization_from_model_id(&self, model_id: &str) -> (String, String) {
@@ -517,7 +521,7 @@ impl AIBOMGenerator {
             authors: Some(vec![Author { name: org.clone() }]),
             copyright: Some("NOASSERTION".to_string()),
             licenses: license_str.as_ref().and_then(|license| {
-                self.normalize_license(license, &model_info.model_id)
+                self.normalize_license(license, model_info)
                     .map(|license_info| {
                         vec![License {
                             license: license_info,

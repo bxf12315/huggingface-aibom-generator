@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:e6248600-0d83-4e1f-8cdc-4fe22e8e482d",
+  "serialNumber": "urn:uuid:8d09d459-9c5b-467b-980b-4646c04eb3d9",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-09T05:00:03.187113+00:00",
+    "timestamp": "2025-09-09T05:39:07.771292+00:00",
     "tools": {
       "components": [
         {
@@ -20,12 +20,12 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/aeevnn%2FNaveenBhav@1.0",
-      "name": "NaveenBhav",
+      "bom-ref": "pkg:generic/tencent%2FHunyuanWorld-Voyager@1.0",
+      "name": "HunyuanWorld-Voyager",
       "version": "1.0",
       "description": "No description available",
       "copyright": "NOASSERTION",
-      "purl": "pkg:generic/aeevnn%2FNaveenBhav@1.0"
+      "purl": "pkg:generic/tencent%2FHunyuanWorld-Voyager@1.0"
     },
     "properties": [
       {
@@ -34,378 +34,59 @@
       },
       {
         "name": "suppliedBy",
-        "value": "aeevnn"
+        "value": "tencent"
       }
     ]
   },
   "components": [
     {
       "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
-      "name": "DeepSeek-V3.1-Base",
+      "bom-ref": "pkg:huggingface/tencent/HunyuanWorld-Voyager@1.0",
+      "name": "HunyuanWorld-Voyager",
       "version": "1.0",
       "description": "No description available",
-      "group": "deepseek-ai",
-      "publisher": "deepseek-ai",
+      "group": "tencent",
+      "publisher": "tencent",
       "supplier": {
-        "name": "deepseek-ai",
+        "name": "tencent",
         "url": [
-          "https://huggingface.co/deepseek-ai"
+          "https://huggingface.co/tencent"
         ]
       },
       "manufacturer": {
-        "name": "deepseek-ai",
+        "name": "tencent",
         "url": [
-          "https://huggingface.co/deepseek-ai"
+          "https://huggingface.co/tencent"
         ]
       },
       "authors": [
         {
-          "name": "deepseek-ai"
+          "name": "tencent"
         }
       ],
       "copyright": "NOASSERTION",
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "name": "MIT License",
-            "url": "https://spdx.org/licenses/MIT"
+            "name": "tencent-hunyuanworld-voyager-community",
+            "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager/resolve/main/LICENSE"
           }
         }
       ],
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base"
+          "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager"
         }
       ],
-      "purl": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
-      "modelCard": {
-        "modelParameters": {
-          "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
-          "task": "text-generation",
-          "inputs": [
-            {
-              "format": "text"
-            }
-          ],
-          "outputs": [
-            {
-              "format": "generated-text"
-            }
-          ]
-        },
-        "properties": [
-          {
-            "name": "bomFormat",
-            "value": "CycloneDX"
-          },
-          {
-            "name": "specVersion",
-            "value": "1.6"
-          },
-          {
-            "name": "serialNumber",
-            "value": "urn:uuid:deepseek-ai-DeepSeek-V3.1-Base"
-          },
-          {
-            "name": "version",
-            "value": "1.0.0"
-          },
-          {
-            "name": "primaryPurpose",
-            "value": "text-generation"
-          },
-          {
-            "name": "suppliedBy",
-            "value": "deepseek-ai"
-          },
-          {
-            "name": "typeOfModel",
-            "value": "transformer"
-          },
-          {
-            "name": "downloadLocation",
-            "value": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main"
-          },
-          {
-            "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main\", \"comment\": \"Model files\"}]"
-          }
-        ],
-        "quantitativeAnalysis": {
-          "graphics": {}
-        }
-      }
-    },
-    {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B@1.0",
-      "name": "Llama-3.1-8B",
-      "version": "1.0",
-      "description": "No description available",
-      "group": "meta-llama",
-      "publisher": "meta-llama",
-      "supplier": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "manufacturer": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "authors": [
-        {
-          "name": "meta-llama"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "licenses": [
-        {
-          "license": {
-            "name": "llama3.1",
-            "text": "LLAMA 3.1 COMMUNITY LICENSE AGREEMENT\nLlama 3.1 Version Release Date: July 23, 2024\n\n“Agreement” means the terms and conditions for use, reproduction, distribution and modification of the\nLlama Materials set forth herein.\n\n“Documentation” means the specifications, manuals and documentation accompanying Llama 3.1\ndistributed by Meta at https://llama.meta.com/doc/overview.\n\n“Licensee” or “you” means you, or your employer or any other person or entity (if you are entering into\nthis Agreement on such person or entity’s behalf), of the age required under applicable laws, rules or\nregulations to provide legal consent and that has legal authority to bind your employer or such other\nperson or entity if you are entering in this Agreement on their behalf.\n\n“Llama 3.1” means the foundational large language models and software and algorithms, including\nmachine-learning model code, trained model weights, inference-enabling code, training-enabling code,\nfine-tuning enabling code and other elements of the foregoing distributed by Meta at\nhttps://llama.meta.com/llama-downloads.\n\n“Llama Materials” means, collectively, Meta’s proprietary Llama 3.1 and Documentation (and any\nportion thereof) made available under this Agreement.\n\n“Meta” or “we” means Meta Platforms Ireland Limited (if you are located in or, if you are an entity, your\nprincipal place of business is in the EEA or Switzerland) and Meta Platforms, Inc. (if you are located\noutside of the EEA or Switzerland).\n\nBy clicking “I Accept” below or by using or distributing any portion or element of the Llama Materials,\nyou agree to be bound by this Agreement.\n\n1. License Rights and Redistribution.\n\n  a. Grant of Rights. You are granted a non-exclusive, worldwide, non-transferable and royalty-free\nlimited license under Meta’s intellectual property or other rights owned by Meta embodied in the Llama\nMaterials to use, reproduce, distribute, copy, create derivative works of, and make modifications to the\nLlama Materials.\n\n  b. Redistribution and Use.\n\n      i. If you distribute or make available the Llama Materials (or any derivative works\nthereof), or a product or service (including another AI model) that contains any of them, you shall (A)\nprovide a copy of this Agreement with any such Llama Materials; and (B) prominently display “Built with\nLlama” on a related website, user interface, blogpost, about page, or product documentation. If you use\nthe Llama Materials or any outputs or results of the Llama Materials to create, train, fine tune, or\notherwise improve an AI model, which is distributed or made available, you shall also include “Llama” at\nthe beginning of any such AI model name.\n\n      ii. If you receive Llama Materials, or any derivative works thereof, from a Licensee as part \nof an integrated end user product, then Section 2 of this Agreement will not apply to you.\n\n      iii. You must retain in all copies of the Llama Materials that you distribute the following\nattribution notice within a “Notice” text file distributed as a part of such copies: “Llama 3.1 is\nlicensed under the Llama 3.1 Community License, Copyright © Meta Platforms, Inc. All Rights\nReserved.”\n\n      iv. Your use of the Llama Materials must comply with applicable laws and regulations\n(including trade compliance laws and regulations) and adhere to the Acceptable Use Policy for the Llama\nMaterials (available at https://llama.meta.com/llama3_1/use-policy), which is hereby incorporated by\nreference into this Agreement.\n\n2. Additional Commercial Terms. If, on the Llama 3.1 version release date, the monthly active users\nof the products or services made available by or for Licensee, or Licensee’s affiliates, is greater than 700\nmillion monthly active users in the preceding calendar month, you must request a license from Meta,\nwhich Meta may grant to you in its sole discretion, and you are not authorized to exercise any of the\nrights under this Agreement unless or until Meta otherwise expressly grants you such rights.\n\n3. Disclaimer of Warranty. UNLESS REQUIRED BY APPLICABLE LAW, THE LLAMA MATERIALS AND ANY\nOUTPUT AND RESULTS THEREFROM ARE PROVIDED ON AN “AS IS” BASIS, WITHOUT WARRANTIES OF\nANY KIND, AND META DISCLAIMS ALL WARRANTIES OF ANY KIND, BOTH EXPRESS AND IMPLIED,\nINCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OF TITLE, NON-INFRINGEMENT,\nMERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. YOU ARE SOLELY RESPONSIBLE FOR\nDETERMINING THE APPROPRIATENESS OF USING OR REDISTRIBUTING THE LLAMA MATERIALS AND\nASSUME ANY RISKS ASSOCIATED WITH YOUR USE OF THE LLAMA MATERIALS AND ANY OUTPUT AND\nRESULTS.\n\n4. Limitation of Liability. IN NO EVENT WILL META OR ITS AFFILIATES BE LIABLE UNDER ANY THEORY OF\nLIABILITY, WHETHER IN CONTRACT, TORT, NEGLIGENCE, PRODUCTS LIABILITY, OR OTHERWISE, ARISING\nOUT OF THIS AGREEMENT, FOR ANY LOST PROFITS OR ANY INDIRECT, SPECIAL, CONSEQUENTIAL,\nINCIDENTAL, EXEMPLARY OR PUNITIVE DAMAGES, EVEN IF META OR ITS AFFILIATES HAVE BEEN ADVISED\nOF THE POSSIBILITY OF ANY OF THE FOREGOING.\n\n5. Intellectual Property.\n\n  a. No trademark licenses are granted under this Agreement, and in connection with the Llama\nMaterials, neither Meta nor Licensee may use any name or mark owned by or associated with the other\nor any of its affiliates, except as required for reasonable and customary use in describing and\nredistributing the Llama Materials or as set forth in this Section 5(a). Meta hereby grants you a license to\nuse “Llama” (the “Mark”) solely as required to comply with the last sentence of Section 1.b.i. You will\ncomply with Meta’s brand guidelines (currently accessible at\nhttps://about.meta.com/brand/resources/meta/company-brand/ ). All goodwill arising out of your use\nof the Mark will inure to the benefit of Meta.\n\n  b. Subject to Meta’s ownership of Llama Materials and derivatives made by or for Meta, with\nrespect to any derivative works and modifications of the Llama Materials that are made by you, as\nbetween you and Meta, you are and will be the owner of such derivative works and modifications.\n\n  c. If you institute litigation or other proceedings against Meta or any entity (including a\ncross-claim or counterclaim in a lawsuit) alleging that the Llama Materials or Llama 3.1 outputs or\nresults, or any portion of any of the foregoing, constitutes infringement of intellectual property or other\nrights owned or licensable by you, then any licenses granted to you under this Agreement shall\nterminate as of the date such litigation or claim is filed or instituted. You will indemnify and hold\nharmless Meta from and against any claim by any third party arising out of or related to your use or\ndistribution of the Llama Materials.\n\n6. Term and Termination. The term of this Agreement will commence upon your acceptance of this\nAgreement or access to the Llama Materials and will continue in full force and effect until terminated in\naccordance with the terms and conditions herein. Meta may terminate this Agreement if you are in\nbreach of any term or condition of this Agreement. Upon termination of this Agreement, you shall delete\nand cease use of the Llama Materials. Sections 3, 4 and 7 shall survive the termination of this\nAgreement.\n\n7. Governing Law and Jurisdiction. This Agreement will be governed and construed under the laws of\nthe State of California without regard to choice of law principles, and the UN Convention on Contracts\nfor the International Sale of Goods does not apply to this Agreement. The courts of California shall have\nexclusive jurisdiction of any dispute arising out of this Agreement."
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/meta-llama/Llama-3.1-8B"
-        }
-      ],
-      "purl": "pkg:huggingface/meta-llama/Llama-3.1-8B@1.0",
-      "modelCard": {
-        "modelParameters": {
-          "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
-          "task": "text-generation",
-          "inputs": [
-            {
-              "format": "text"
-            }
-          ],
-          "outputs": [
-            {
-              "format": "generated-text"
-            }
-          ]
-        },
-        "properties": [
-          {
-            "name": "bomFormat",
-            "value": "CycloneDX"
-          },
-          {
-            "name": "specVersion",
-            "value": "1.6"
-          },
-          {
-            "name": "serialNumber",
-            "value": "urn:uuid:meta-llama-Llama-3.1-8B"
-          },
-          {
-            "name": "version",
-            "value": "1.0.0"
-          },
-          {
-            "name": "primaryPurpose",
-            "value": "text-generation"
-          },
-          {
-            "name": "suppliedBy",
-            "value": "meta-llama"
-          },
-          {
-            "name": "typeOfModel",
-            "value": "transformer"
-          },
-          {
-            "name": "downloadLocation",
-            "value": "https://huggingface.co/meta-llama/Llama-3.1-8B/tree/main"
-          },
-          {
-            "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B/tree/main\", \"comment\": \"Model files\"}]"
-          }
-        ],
-        "quantitativeAnalysis": {
-          "graphics": {}
-        }
-      }
-    },
-    {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-      "name": "Llama-3.1-8B-Instruct",
-      "version": "1.0",
-      "description": "No description available",
-      "group": "meta-llama",
-      "publisher": "meta-llama",
-      "supplier": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "manufacturer": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "authors": [
-        {
-          "name": "meta-llama"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "licenses": [
-        {
-          "license": {
-            "name": "llama3.1",
-            "text": "LLAMA 3.1 COMMUNITY LICENSE AGREEMENT\nLlama 3.1 Version Release Date: July 23, 2024\n\n“Agreement” means the terms and conditions for use, reproduction, distribution and modification of the\nLlama Materials set forth herein.\n\n“Documentation” means the specifications, manuals and documentation accompanying Llama 3.1\ndistributed by Meta at https://llama.meta.com/doc/overview.\n\n“Licensee” or “you” means you, or your employer or any other person or entity (if you are entering into\nthis Agreement on such person or entity’s behalf), of the age required under applicable laws, rules or\nregulations to provide legal consent and that has legal authority to bind your employer or such other\nperson or entity if you are entering in this Agreement on their behalf.\n\n“Llama 3.1” means the foundational large language models and software and algorithms, including\nmachine-learning model code, trained model weights, inference-enabling code, training-enabling code,\nfine-tuning enabling code and other elements of the foregoing distributed by Meta at\nhttps://llama.meta.com/llama-downloads.\n\n“Llama Materials” means, collectively, Meta’s proprietary Llama 3.1 and Documentation (and any\nportion thereof) made available under this Agreement.\n\n“Meta” or “we” means Meta Platforms Ireland Limited (if you are located in or, if you are an entity, your\nprincipal place of business is in the EEA or Switzerland) and Meta Platforms, Inc. (if you are located\noutside of the EEA or Switzerland).\n\nBy clicking “I Accept” below or by using or distributing any portion or element of the Llama Materials,\nyou agree to be bound by this Agreement.\n\n1. License Rights and Redistribution.\n\n  a. Grant of Rights. You are granted a non-exclusive, worldwide, non-transferable and royalty-free\nlimited license under Meta’s intellectual property or other rights owned by Meta embodied in the Llama\nMaterials to use, reproduce, distribute, copy, create derivative works of, and make modifications to the\nLlama Materials.\n\n  b. Redistribution and Use.\n\n      i. If you distribute or make available the Llama Materials (or any derivative works\nthereof), or a product or service (including another AI model) that contains any of them, you shall (A)\nprovide a copy of this Agreement with any such Llama Materials; and (B) prominently display “Built with\nLlama” on a related website, user interface, blogpost, about page, or product documentation. If you use\nthe Llama Materials or any outputs or results of the Llama Materials to create, train, fine tune, or\notherwise improve an AI model, which is distributed or made available, you shall also include “Llama” at\nthe beginning of any such AI model name.\n\n      ii. If you receive Llama Materials, or any derivative works thereof, from a Licensee as part \nof an integrated end user product, then Section 2 of this Agreement will not apply to you.\n\n      iii. You must retain in all copies of the Llama Materials that you distribute the following\nattribution notice within a “Notice” text file distributed as a part of such copies: “Llama 3.1 is\nlicensed under the Llama 3.1 Community License, Copyright © Meta Platforms, Inc. All Rights\nReserved.”\n\n      iv. Your use of the Llama Materials must comply with applicable laws and regulations\n(including trade compliance laws and regulations) and adhere to the Acceptable Use Policy for the Llama\nMaterials (available at https://llama.meta.com/llama3_1/use-policy), which is hereby incorporated by\nreference into this Agreement.\n\n2. Additional Commercial Terms. If, on the Llama 3.1 version release date, the monthly active users\nof the products or services made available by or for Licensee, or Licensee’s affiliates, is greater than 700\nmillion monthly active users in the preceding calendar month, you must request a license from Meta,\nwhich Meta may grant to you in its sole discretion, and you are not authorized to exercise any of the\nrights under this Agreement unless or until Meta otherwise expressly grants you such rights.\n\n3. Disclaimer of Warranty. UNLESS REQUIRED BY APPLICABLE LAW, THE LLAMA MATERIALS AND ANY\nOUTPUT AND RESULTS THEREFROM ARE PROVIDED ON AN “AS IS” BASIS, WITHOUT WARRANTIES OF\nANY KIND, AND META DISCLAIMS ALL WARRANTIES OF ANY KIND, BOTH EXPRESS AND IMPLIED,\nINCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OF TITLE, NON-INFRINGEMENT,\nMERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. YOU ARE SOLELY RESPONSIBLE FOR\nDETERMINING THE APPROPRIATENESS OF USING OR REDISTRIBUTING THE LLAMA MATERIALS AND\nASSUME ANY RISKS ASSOCIATED WITH YOUR USE OF THE LLAMA MATERIALS AND ANY OUTPUT AND\nRESULTS.\n\n4. Limitation of Liability. IN NO EVENT WILL META OR ITS AFFILIATES BE LIABLE UNDER ANY THEORY OF\nLIABILITY, WHETHER IN CONTRACT, TORT, NEGLIGENCE, PRODUCTS LIABILITY, OR OTHERWISE, ARISING\nOUT OF THIS AGREEMENT, FOR ANY LOST PROFITS OR ANY INDIRECT, SPECIAL, CONSEQUENTIAL,\nINCIDENTAL, EXEMPLARY OR PUNITIVE DAMAGES, EVEN IF META OR ITS AFFILIATES HAVE BEEN ADVISED\nOF THE POSSIBILITY OF ANY OF THE FOREGOING.\n\n5. Intellectual Property.\n\n  a. No trademark licenses are granted under this Agreement, and in connection with the Llama\nMaterials, neither Meta nor Licensee may use any name or mark owned by or associated with the other\nor any of its affiliates, except as required for reasonable and customary use in describing and\nredistributing the Llama Materials or as set forth in this Section 5(a). Meta hereby grants you a license to\nuse “Llama” (the “Mark”) solely as required to comply with the last sentence of Section 1.b.i. You will\ncomply with Meta’s brand guidelines (currently accessible at\nhttps://about.meta.com/brand/resources/meta/company-brand/ ). All goodwill arising out of your use\nof the Mark will inure to the benefit of Meta.\n\n  b. Subject to Meta’s ownership of Llama Materials and derivatives made by or for Meta, with\nrespect to any derivative works and modifications of the Llama Materials that are made by you, as\nbetween you and Meta, you are and will be the owner of such derivative works and modifications.\n\n  c. If you institute litigation or other proceedings against Meta or any entity (including a\ncross-claim or counterclaim in a lawsuit) alleging that the Llama Materials or Llama 3.1 outputs or\nresults, or any portion of any of the foregoing, constitutes infringement of intellectual property or other\nrights owned or licensable by you, then any licenses granted to you under this Agreement shall\nterminate as of the date such litigation or claim is filed or instituted. You will indemnify and hold\nharmless Meta from and against any claim by any third party arising out of or related to your use or\ndistribution of the Llama Materials.\n\n6. Term and Termination. The term of this Agreement will commence upon your acceptance of this\nAgreement or access to the Llama Materials and will continue in full force and effect until terminated in\naccordance with the terms and conditions herein. Meta may terminate this Agreement if you are in\nbreach of any term or condition of this Agreement. Upon termination of this Agreement, you shall delete\nand cease use of the Llama Materials. Sections 3, 4 and 7 shall survive the termination of this\nAgreement.\n\n7. Governing Law and Jurisdiction. This Agreement will be governed and construed under the laws of\nthe State of California without regard to choice of law principles, and the UN Convention on Contracts\nfor the International Sale of Goods does not apply to this Agreement. The courts of California shall have\nexclusive jurisdiction of any dispute arising out of this Agreement."
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct"
-        }
-      ],
-      "purl": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-      "modelCard": {
-        "modelParameters": {
-          "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
-          "task": "text-generation",
-          "inputs": [
-            {
-              "format": "text"
-            }
-          ],
-          "outputs": [
-            {
-              "format": "generated-text"
-            }
-          ]
-        },
-        "properties": [
-          {
-            "name": "bomFormat",
-            "value": "CycloneDX"
-          },
-          {
-            "name": "specVersion",
-            "value": "1.6"
-          },
-          {
-            "name": "serialNumber",
-            "value": "urn:uuid:meta-llama-Llama-3.1-8B-Instruct"
-          },
-          {
-            "name": "version",
-            "value": "1.0.0"
-          },
-          {
-            "name": "primaryPurpose",
-            "value": "text-generation"
-          },
-          {
-            "name": "suppliedBy",
-            "value": "meta-llama"
-          },
-          {
-            "name": "typeOfModel",
-            "value": "transformer"
-          },
-          {
-            "name": "downloadLocation",
-            "value": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main"
-          },
-          {
-            "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main\", \"comment\": \"Model files\"}]"
-          }
-        ],
-        "quantitativeAnalysis": {
-          "graphics": {}
-        }
-      }
-    },
-    {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
-      "name": "NaveenBhav",
-      "version": "1.0",
-      "description": "No description available",
-      "group": "aeevnn",
-      "publisher": "aeevnn",
-      "supplier": {
-        "name": "aeevnn",
-        "url": [
-          "https://huggingface.co/aeevnn"
-        ]
-      },
-      "manufacturer": {
-        "name": "aeevnn",
-        "url": [
-          "https://huggingface.co/aeevnn"
-        ]
-      },
-      "authors": [
-        {
-          "name": "aeevnn"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/aeevnn/NaveenBhav"
-        }
-      ],
-      "purl": "pkg:huggingface/aeevnn/NaveenBhav@1.0"
+      "purl": "pkg:huggingface/tencent/HunyuanWorld-Voyager@1.0"
     }
   ],
-  "dependencies": [
-    {
-      "ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
-      "dependsOn": [
-        {
-          "ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
-          "relation": "adapter",
-          "scope": "required"
-        },
-        {
-          "ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-          "relation": "adapter",
-          "scope": "required"
-        }
-      ]
-    },
-    {
-      "ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-      "dependsOn": [
-        {
-          "ref": "pkg:huggingface/meta-llama/Meta-Llama-3.1-8B@1.0",
-          "relation": "finetuned",
-          "scope": "required"
-        }
-      ]
-    }
-  ],
+  "dependencies": [],
   "externalReferences": [
     {
       "type": "distribution",
-      "url": "https://huggingface.co/aeevnn/NaveenBhav"
+      "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager"
     }
   ]
 }
