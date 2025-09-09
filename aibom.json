@@ -1,0 +1,257 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:ded3d926-8d5b-43fb-b5ab-6163a890f327",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-09-09T00:53:16.527542+00:00",
+    "tools": {
+      "components": [
+        {
+          "bom-ref": "pkg:generic/rust-aibom-generator@1.0.0",
+          "manufacturer": {
+            "name": "Rust AIBOM Generator"
+          },
+          "name": "rust-aibom-generator",
+          "type": "application",
+          "version": "1.0"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "pkg:generic/microsoft%2FDialoGPT-medium@1.0",
+      "name": "DialoGPT-medium",
+      "version": "1.0",
+      "description": "No description available",
+      "copyright": "NOASSERTION",
+      "purl": "pkg:generic/microsoft%2FDialoGPT-medium@1.0"
+    },
+    "properties": [
+      {
+        "name": "primaryPurpose",
+        "value": "text-generation"
+      },
+      {
+        "name": "suppliedBy",
+        "value": "microsoft"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/microsoft/DialoGPT-base@1.0",
+      "name": "DialoGPT-base",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "microsoft",
+      "publisher": "microsoft",
+      "supplier": {
+        "name": "microsoft",
+        "url": [
+          "https://huggingface.co/microsoft"
+        ]
+      },
+      "manufacturer": {
+        "name": "microsoft",
+        "url": [
+          "https://huggingface.co/microsoft"
+        ]
+      },
+      "authors": [
+        {
+          "name": "microsoft"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://spdx.org/licenses/Apache-2.0.html"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/microsoft/DialoGPT-base"
+        }
+      ],
+      "purl": "pkg:huggingface/microsoft/DialoGPT-base@1.0",
+      "modelCard": {
+        "modelParameters": {
+          "architectureFamily": "transformer",
+          "modelArchitecture": "DialoGPTForCausalLM",
+          "task": "text-generation",
+          "inputs": [
+            {
+              "format": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "generated-text"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "bomFormat",
+            "value": "CycloneDX"
+          },
+          {
+            "name": "specVersion",
+            "value": "1.6"
+          },
+          {
+            "name": "serialNumber",
+            "value": "urn:uuid:microsoft-DialoGPT-base"
+          },
+          {
+            "name": "version",
+            "value": "1.0.0"
+          },
+          {
+            "name": "primaryPurpose",
+            "value": "text-generation"
+          },
+          {
+            "name": "suppliedBy",
+            "value": "microsoft"
+          },
+          {
+            "name": "typeOfModel",
+            "value": "transformer"
+          },
+          {
+            "name": "downloadLocation",
+            "value": "https://huggingface.co/microsoft/DialoGPT-base/tree/main"
+          },
+          {
+            "name": "external_references",
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-base\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-base/tree/main\", \"comment\": \"Model files\"}]"
+          }
+        ],
+        "quantitativeAnalysis": {
+          "graphics": {}
+        }
+      }
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "name": "DialoGPT-medium",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "microsoft",
+      "publisher": "microsoft",
+      "supplier": {
+        "name": "microsoft",
+        "url": [
+          "https://huggingface.co/microsoft"
+        ]
+      },
+      "manufacturer": {
+        "name": "microsoft",
+        "url": [
+          "https://huggingface.co/microsoft"
+        ]
+      },
+      "authors": [
+        {
+          "name": "microsoft"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://spdx.org/licenses/Apache-2.0.html"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/microsoft/DialoGPT-medium"
+        }
+      ],
+      "purl": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "modelCard": {
+        "modelParameters": {
+          "architectureFamily": "transformer",
+          "modelArchitecture": "DialoGPTForCausalLM",
+          "task": "text-generation",
+          "inputs": [
+            {
+              "format": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "generated-text"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "bomFormat",
+            "value": "CycloneDX"
+          },
+          {
+            "name": "specVersion",
+            "value": "1.6"
+          },
+          {
+            "name": "serialNumber",
+            "value": "urn:uuid:microsoft-DialoGPT-medium"
+          },
+          {
+            "name": "version",
+            "value": "1.0.0"
+          },
+          {
+            "name": "primaryPurpose",
+            "value": "text-generation"
+          },
+          {
+            "name": "suppliedBy",
+            "value": "microsoft"
+          },
+          {
+            "name": "typeOfModel",
+            "value": "transformer"
+          },
+          {
+            "name": "downloadLocation",
+            "value": "https://huggingface.co/microsoft/DialoGPT-medium/tree/main"
+          },
+          {
+            "name": "external_references",
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-medium\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-medium/tree/main\", \"comment\": \"Model files\"}]"
+          }
+        ],
+        "quantitativeAnalysis": {
+          "graphics": {}
+        }
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "dependsOn": [
+        "pkg:huggingface/microsoft/DialoGPT-base@1.0"
+      ]
+    }
+  ],
+  "externalReferences": [
+    {
+      "type": "distribution",
+      "url": "https://huggingface.co/microsoft/DialoGPT-medium"
+    }
+  ]
+}
