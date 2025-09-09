@@ -27,6 +27,16 @@ This project generates comprehensive AI Bill of Materials (AIBOM) documents for 
 - `cli/` - Command-line interface tool
 - `server/` - HTTP server (based on actix_web)
 - `lib/` - Core library containing AIBOM generation logic
+  - `generator.rs` - Main orchestrator, dependency processing, and public API
+  - `model_analyzer.rs` - Model analysis and dependency extraction
+  - `license_handler.rs` - License detection and normalization
+  - `component_generator.rs` - CycloneDX component creation
+  - `models/` - Data structures and type definitions
+
+### Architecture Flow
+```
+Input → ModelAnalyzer → ComponentGenerator → AIBOMGenerator → Output
+```
 
 ## Installation
 
