@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8d09d459-9c5b-467b-980b-4646c04eb3d9",
+  "serialNumber": "urn:uuid:a18191a7-353b-4dc2-9d2c-342b07c620e4",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-09T05:39:07.771292+00:00",
+    "timestamp": "2025-09-09T06:54:59.703471+00:00",
     "tools": {
       "components": [
         {
@@ -20,12 +20,12 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/tencent%2FHunyuanWorld-Voyager@1.0",
-      "name": "HunyuanWorld-Voyager",
+      "bom-ref": "pkg:generic/brrski%2Fbrenner@1.0",
+      "name": "brenner",
       "version": "1.0",
       "description": "No description available",
       "copyright": "NOASSERTION",
-      "purl": "pkg:generic/tencent%2FHunyuanWorld-Voyager@1.0"
+      "purl": "pkg:generic/brrski%2Fbrenner@1.0"
     },
     "properties": [
       {
@@ -34,59 +34,335 @@
       },
       {
         "name": "suppliedBy",
-        "value": "tencent"
+        "value": "brrski"
       }
     ]
   },
   "components": [
     {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/tencent/HunyuanWorld-Voyager@1.0",
-      "name": "HunyuanWorld-Voyager",
+      "type": "data",
+      "bom-ref": "pkg:huggingface-dataset/Anthropic/values-in-the-wild@1.0",
+      "name": "values-in-the-wild",
       "version": "1.0",
-      "description": "No description available",
-      "group": "tencent",
-      "publisher": "tencent",
+      "description": "Training dataset",
+      "group": "Anthropic",
+      "publisher": "Anthropic",
       "supplier": {
-        "name": "tencent",
+        "name": "Anthropic",
         "url": [
-          "https://huggingface.co/tencent"
+          "https://huggingface.co/datasets/Anthropic"
         ]
       },
       "manufacturer": {
-        "name": "tencent",
+        "name": "Anthropic",
         "url": [
-          "https://huggingface.co/tencent"
+          "https://huggingface.co/datasets/Anthropic"
         ]
       },
       "authors": [
         {
-          "name": "tencent"
+          "name": "Anthropic"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/datasets/Anthropic/values-in-the-wild",
+          "comment": "Dataset repository"
+        }
+      ],
+      "purl": "pkg:huggingface-dataset/Anthropic/values-in-the-wild@1.0"
+    },
+    {
+      "type": "data",
+      "bom-ref": "pkg:huggingface-dataset/nvidia/OpenCodeReasoning@1.0",
+      "name": "OpenCodeReasoning",
+      "version": "1.0",
+      "description": "Training dataset",
+      "group": "nvidia",
+      "publisher": "nvidia",
+      "supplier": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/datasets/nvidia"
+        ]
+      },
+      "manufacturer": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/datasets/nvidia"
+        ]
+      },
+      "authors": [
+        {
+          "name": "nvidia"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/datasets/nvidia/OpenCodeReasoning",
+          "comment": "Dataset repository"
+        }
+      ],
+      "purl": "pkg:huggingface-dataset/nvidia/OpenCodeReasoning@1.0"
+    },
+    {
+      "type": "data",
+      "bom-ref": "pkg:huggingface-dataset/nvidia/Granary@1.0",
+      "name": "Granary",
+      "version": "1.0",
+      "description": "Training dataset",
+      "group": "nvidia",
+      "publisher": "nvidia",
+      "supplier": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/datasets/nvidia"
+        ]
+      },
+      "manufacturer": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/datasets/nvidia"
+        ]
+      },
+      "authors": [
+        {
+          "name": "nvidia"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/datasets/nvidia/Granary",
+          "comment": "Dataset repository"
+        }
+      ],
+      "purl": "pkg:huggingface-dataset/nvidia/Granary@1.0"
+    },
+    {
+      "type": "data",
+      "bom-ref": "pkg:huggingface-dataset/nvidia/nemo-asr-set-3.0@1.0",
+      "name": "nemo-asr-set-3.0",
+      "version": "1.0",
+      "description": "Training dataset",
+      "group": "nvidia",
+      "publisher": "nvidia",
+      "supplier": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/datasets/nvidia"
+        ]
+      },
+      "manufacturer": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/datasets/nvidia"
+        ]
+      },
+      "authors": [
+        {
+          "name": "nvidia"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/datasets/nvidia/nemo-asr-set-3.0",
+          "comment": "Dataset repository"
+        }
+      ],
+      "purl": "pkg:huggingface-dataset/nvidia/nemo-asr-set-3.0@1.0"
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
+      "name": "parakeet-tdt-0.6b-v2",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "nvidia",
+      "publisher": "nvidia",
+      "supplier": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/nvidia"
+        ]
+      },
+      "manufacturer": {
+        "name": "nvidia",
+        "url": [
+          "https://huggingface.co/nvidia"
+        ]
+      },
+      "authors": [
+        {
+          "name": "nvidia"
         }
       ],
       "copyright": "NOASSERTION",
       "licenses": [
         {
           "license": {
-            "name": "tencent-hunyuanworld-voyager-community",
-            "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager/resolve/main/LICENSE"
+            "id": "CC-BY-4.0",
+            "url": "https://spdx.org/licenses/CC-BY-4.0"
           }
         }
       ],
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager"
+          "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2"
         }
       ],
-      "purl": "pkg:huggingface/tencent/HunyuanWorld-Voyager@1.0"
+      "purl": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
+      "modelCard": {
+        "modelParameters": {
+          "architectureFamily": "transformer",
+          "modelArchitecture": "TransformerModel",
+          "task": "text-generation",
+          "inputs": [
+            {
+              "format": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "generated-text"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "bomFormat",
+            "value": "CycloneDX"
+          },
+          {
+            "name": "specVersion",
+            "value": "1.6"
+          },
+          {
+            "name": "serialNumber",
+            "value": "urn:uuid:nvidia-parakeet-tdt-0.6b-v2"
+          },
+          {
+            "name": "version",
+            "value": "1.0.0"
+          },
+          {
+            "name": "primaryPurpose",
+            "value": "text-generation"
+          },
+          {
+            "name": "suppliedBy",
+            "value": "nvidia"
+          },
+          {
+            "name": "typeOfModel",
+            "value": "transformer"
+          },
+          {
+            "name": "downloadLocation",
+            "value": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2/tree/main"
+          },
+          {
+            "name": "external_references",
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2/tree/main\", \"comment\": \"Model files\"}]"
+          }
+        ],
+        "quantitativeAnalysis": {
+          "graphics": {}
+        }
+      }
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/brrski/brenner@1.0",
+      "name": "brenner",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "brrski",
+      "publisher": "brrski",
+      "supplier": {
+        "name": "brrski",
+        "url": [
+          "https://huggingface.co/brrski"
+        ]
+      },
+      "manufacturer": {
+        "name": "brrski",
+        "url": [
+          "https://huggingface.co/brrski"
+        ]
+      },
+      "authors": [
+        {
+          "name": "brrski"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "url": "https://spdx.org/licenses/MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/brrski/brenner"
+        }
+      ],
+      "purl": "pkg:huggingface/brrski/brenner@1.0"
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
+      "dependsOn": [
+        {
+          "ref": "pkg:huggingface-dataset/nvidia/Granary@1.0",
+          "relation": "train",
+          "scope": "required"
+        },
+        {
+          "ref": "pkg:huggingface-dataset/nvidia/nemo-asr-set-3.0@1.0",
+          "relation": "train",
+          "scope": "required"
+        }
+      ]
+    },
+    {
+      "ref": "pkg:huggingface/brrski/brenner@1.0",
+      "dependsOn": [
+        {
+          "ref": "pkg:huggingface-dataset/Anthropic/values-in-the-wild@1.0",
+          "relation": "train",
+          "scope": "required"
+        },
+        {
+          "ref": "pkg:huggingface-dataset/nvidia/OpenCodeReasoning@1.0",
+          "relation": "train",
+          "scope": "required"
+        },
+        {
+          "ref": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
+          "relation": "adapter",
+          "scope": "required"
+        }
+      ]
+    }
+  ],
   "externalReferences": [
     {
       "type": "distribution",
-      "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager"
+      "url": "https://huggingface.co/brrski/brenner"
     }
   ]
 }
