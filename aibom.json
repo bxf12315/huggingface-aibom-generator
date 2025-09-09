@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:20cea7e0-c54f-4197-88c4-01a417234066",
+  "serialNumber": "urn:uuid:9326fb7a-10e0-4763-a292-eaac9b00a3b7",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-09T08:36:16.070389+00:00",
+    "timestamp": "2025-09-09T10:38:19.489553+00:00",
     "tools": {
       "components": [
         {
@@ -20,12 +20,12 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/aeevnn%2FNaveenBhav@1.0",
-      "name": "NaveenBhav",
+      "bom-ref": "pkg:generic/tencent%2FHunyuanWorld-Voyager@1.0",
+      "name": "HunyuanWorld-Voyager",
       "version": "1.0",
       "description": "No description available",
       "copyright": "NOASSERTION",
-      "purl": "pkg:generic/aeevnn%2FNaveenBhav@1.0"
+      "purl": "pkg:generic/tencent%2FHunyuanWorld-Voyager@1.0"
     },
     "properties": [
       {
@@ -34,413 +34,59 @@
       },
       {
         "name": "suppliedBy",
-        "value": "aeevnn"
+        "value": "tencent"
       }
     ]
   },
   "components": [
     {
-      "type": "data",
-      "bom-ref": "pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0",
-      "name": "Llama-Nemotron-VLM-Dataset-v1",
-      "version": "1.0",
-      "description": "Training dataset",
-      "group": "nvidia",
-      "publisher": "nvidia",
-      "supplier": {
-        "name": "nvidia",
-        "url": [
-          "https://huggingface.co/datasets/nvidia"
-        ]
-      },
-      "manufacturer": {
-        "name": "nvidia",
-        "url": [
-          "https://huggingface.co/datasets/nvidia"
-        ]
-      },
-      "authors": [
-        {
-          "name": "nvidia"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/datasets/nvidia/Llama-Nemotron-VLM-Dataset-v1",
-          "comment": "Dataset repository"
-        }
-      ],
-      "purl": "pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0"
-    },
-    {
       "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
-      "name": "DeepSeek-V3.1-Base",
+      "bom-ref": "pkg:huggingface/tencent/HunyuanWorld-Voyager@1.0",
+      "name": "HunyuanWorld-Voyager",
       "version": "1.0",
       "description": "No description available",
-      "group": "deepseek-ai",
-      "publisher": "deepseek-ai",
+      "group": "tencent",
+      "publisher": "tencent",
       "supplier": {
-        "name": "deepseek-ai",
+        "name": "tencent",
         "url": [
-          "https://huggingface.co/deepseek-ai"
+          "https://huggingface.co/tencent"
         ]
       },
       "manufacturer": {
-        "name": "deepseek-ai",
+        "name": "tencent",
         "url": [
-          "https://huggingface.co/deepseek-ai"
+          "https://huggingface.co/tencent"
         ]
       },
       "authors": [
         {
-          "name": "deepseek-ai"
+          "name": "tencent"
         }
       ],
       "copyright": "NOASSERTION",
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "url": "https://spdx.org/licenses/MIT"
+            "name": "tencent-hunyuanworld-voyager-community",
+            "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager/resolve/main/LICENSE"
           }
         }
       ],
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base"
+          "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager"
         }
       ],
-      "purl": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
-      "modelCard": {
-        "modelParameters": {
-          "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
-          "task": "text-generation",
-          "inputs": [
-            {
-              "format": "text"
-            }
-          ],
-          "outputs": [
-            {
-              "format": "generated-text"
-            }
-          ]
-        },
-        "properties": [
-          {
-            "name": "bomFormat",
-            "value": "CycloneDX"
-          },
-          {
-            "name": "specVersion",
-            "value": "1.6"
-          },
-          {
-            "name": "serialNumber",
-            "value": "urn:uuid:deepseek-ai-DeepSeek-V3.1-Base"
-          },
-          {
-            "name": "version",
-            "value": "1.0.0"
-          },
-          {
-            "name": "primaryPurpose",
-            "value": "text-generation"
-          },
-          {
-            "name": "suppliedBy",
-            "value": "deepseek-ai"
-          },
-          {
-            "name": "typeOfModel",
-            "value": "transformer"
-          },
-          {
-            "name": "downloadLocation",
-            "value": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main"
-          },
-          {
-            "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main\", \"comment\": \"Model files\"}]"
-          },
-          {
-            "name": "ai.model.relation",
-            "value": "adapter"
-          }
-        ],
-        "quantitativeAnalysis": {
-          "graphics": {}
-        }
-      }
-    },
-    {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B@1.0",
-      "name": "Llama-3.1-8B",
-      "version": "1.0",
-      "description": "No description available",
-      "group": "meta-llama",
-      "publisher": "meta-llama",
-      "supplier": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "manufacturer": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "authors": [
-        {
-          "name": "meta-llama"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "licenses": [
-        {
-          "license": {
-            "name": "llama3.1",
-            "url": "https://huggingface.co/meta-llama/Llama-3.1-8B/resolve/main/LICENSE"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/meta-llama/Llama-3.1-8B"
-        }
-      ],
-      "purl": "pkg:huggingface/meta-llama/Llama-3.1-8B@1.0",
-      "modelCard": {
-        "modelParameters": {
-          "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
-          "task": "text-generation",
-          "inputs": [
-            {
-              "format": "text"
-            }
-          ],
-          "outputs": [
-            {
-              "format": "generated-text"
-            }
-          ]
-        },
-        "properties": [
-          {
-            "name": "bomFormat",
-            "value": "CycloneDX"
-          },
-          {
-            "name": "specVersion",
-            "value": "1.6"
-          },
-          {
-            "name": "serialNumber",
-            "value": "urn:uuid:meta-llama-Llama-3.1-8B"
-          },
-          {
-            "name": "version",
-            "value": "1.0.0"
-          },
-          {
-            "name": "primaryPurpose",
-            "value": "text-generation"
-          },
-          {
-            "name": "suppliedBy",
-            "value": "meta-llama"
-          },
-          {
-            "name": "typeOfModel",
-            "value": "transformer"
-          },
-          {
-            "name": "downloadLocation",
-            "value": "https://huggingface.co/meta-llama/Llama-3.1-8B/tree/main"
-          },
-          {
-            "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B/tree/main\", \"comment\": \"Model files\"}]"
-          },
-          {
-            "name": "ai.model.relation",
-            "value": "finetuned"
-          }
-        ],
-        "quantitativeAnalysis": {
-          "graphics": {}
-        }
-      }
-    },
-    {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-      "name": "Llama-3.1-8B-Instruct",
-      "version": "1.0",
-      "description": "No description available",
-      "group": "meta-llama",
-      "publisher": "meta-llama",
-      "supplier": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "manufacturer": {
-        "name": "meta-llama",
-        "url": [
-          "https://huggingface.co/meta-llama"
-        ]
-      },
-      "authors": [
-        {
-          "name": "meta-llama"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "licenses": [
-        {
-          "license": {
-            "name": "llama3.1",
-            "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/resolve/main/LICENSE"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct"
-        }
-      ],
-      "purl": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-      "modelCard": {
-        "modelParameters": {
-          "architectureFamily": "transformer",
-          "modelArchitecture": "TransformerModel",
-          "task": "text-generation",
-          "inputs": [
-            {
-              "format": "text"
-            }
-          ],
-          "outputs": [
-            {
-              "format": "generated-text"
-            }
-          ]
-        },
-        "properties": [
-          {
-            "name": "bomFormat",
-            "value": "CycloneDX"
-          },
-          {
-            "name": "specVersion",
-            "value": "1.6"
-          },
-          {
-            "name": "serialNumber",
-            "value": "urn:uuid:meta-llama-Llama-3.1-8B-Instruct"
-          },
-          {
-            "name": "version",
-            "value": "1.0.0"
-          },
-          {
-            "name": "primaryPurpose",
-            "value": "text-generation"
-          },
-          {
-            "name": "suppliedBy",
-            "value": "meta-llama"
-          },
-          {
-            "name": "typeOfModel",
-            "value": "transformer"
-          },
-          {
-            "name": "downloadLocation",
-            "value": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main"
-          },
-          {
-            "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main\", \"comment\": \"Model files\"}]"
-          },
-          {
-            "name": "ai.model.relation",
-            "value": "adapter"
-          }
-        ],
-        "quantitativeAnalysis": {
-          "graphics": {}
-        }
-      }
-    },
-    {
-      "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
-      "name": "NaveenBhav",
-      "version": "1.0",
-      "description": "No description available",
-      "group": "aeevnn",
-      "publisher": "aeevnn",
-      "supplier": {
-        "name": "aeevnn",
-        "url": [
-          "https://huggingface.co/aeevnn"
-        ]
-      },
-      "manufacturer": {
-        "name": "aeevnn",
-        "url": [
-          "https://huggingface.co/aeevnn"
-        ]
-      },
-      "authors": [
-        {
-          "name": "aeevnn"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/aeevnn/NaveenBhav"
-        }
-      ],
-      "purl": "pkg:huggingface/aeevnn/NaveenBhav@1.0"
+      "purl": "pkg:huggingface/tencent/HunyuanWorld-Voyager@1.0"
     }
   ],
-  "dependencies": [
-    {
-      "ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
-      "dependsOn": [
-        "pkg:huggingface/meta-llama/Meta-Llama-3.1-8B@1.0"
-      ]
-    },
-    {
-      "ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
-      "dependsOn": [
-        "pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0",
-        "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
-        "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0"
-      ]
-    }
-  ],
+  "dependencies": [],
   "externalReferences": [
     {
       "type": "distribution",
-      "url": "https://huggingface.co/aeevnn/NaveenBhav"
+      "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager"
     }
   ]
 }
