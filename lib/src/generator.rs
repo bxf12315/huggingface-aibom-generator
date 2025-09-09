@@ -1,11 +1,12 @@
 use crate::*;
+use crate::models::dependency::DependencyReference;
 use std::collections::{HashMap, HashSet};
 
 pub struct AIBOMGenerator {
     api: hf_hub::api::sync::Api,
     processed_models: HashSet<String>,
     components: Vec<Component>,
-    dependencies: HashMap<String, Vec<String>>,
+    dependencies: HashMap<String, Vec<(String, Option<String>)>>,
 }
 
 impl AIBOMGenerator {
@@ -55,25 +56,181 @@ impl AIBOMGenerator {
         Ok(model_info)
     }
 
-    fn extract_dependencies(&self, model_info: &ModelInfo) -> Vec<String> {
+    pub fn extract_dependencies(&self, model_info: &ModelInfo) -> Vec<(String, Option<String>)> {
         let mut dependencies = Vec::new();
 
-        // Extract dependencies from model card data
+        // Only extract dependencies from explicit model card data
         if let Some(card_data) = &model_info.card_data {
+            // Check for explicit base_model field (can be string or array)
             if let Some(base_model) = card_data.get("base_model") {
+                let mut relation = card_data.get("base_model_relation")
+                    .and_then(|r| r.as_str())
+                    .map(|s| s.to_string());
+                
+                // If no explicit relation, try to infer from other fields
+                if relation.is_none() {
+                    // Check library_name first (highest priority for specific model types)
+                    if let Some(library_name) = card_data.get("library_name") {
+                        if let Some(lib_str) = library_name.as_str() {
+                            match lib_str {
+                                "adapter-transformers" | "adapters" => {
+                                    relation = Some("adapter".to_string());
+                                },
+                                "peft" => {
+                                    relation = Some("lora".to_string());
+                                },
+                                _ => {}
+                            }
+                        }
+                    }
+                    
+                    // Check for quantized_by field
+                    if relation.is_none() {
+                        if let Some(quantized_by) = card_data.get("quantized_by") {
+                            if quantized_by.is_string() {
+                                relation = Some("quantized".to_string());
+                            }
+                        }
+                    }
+                    
+                    // Check tags for relation indicators
+                    if relation.is_none() {
+                        for tag in &model_info.tags {
+                            let tag_lower = tag.to_lowercase();
+                            
+                            // Check for base_model:relation:model format
+                            if tag_lower.starts_with("base_model:") {
+                                let parts: Vec<&str> = tag_lower.split(':').collect();
+                                if parts.len() >= 3 && parts[0] == "base_model" {
+                                    match parts[1] {
+                                        "finetune" | "finetuned" => {
+                                            relation = Some("finetuned".to_string());
+                                            break;
+                                        },
+                                        "adapter" => {
+                                            relation = Some("adapter".to_string());
+                                            break;
+                                        },
+                                        "lora" | "qlora" => {
+                                            relation = Some("lora".to_string());
+                                            break;
+                                        },
+                                        "quantized" | "quantization" => {
+                                            relation = Some("quantized".to_string());
+                                            break;
+                                        },
+                                        "merged" | "merge" => {
+                                            relation = Some("merged".to_string());
+                                            break;
+                                        },
+                                        "distilled" | "distillation" => {
+                                            relation = Some("distilled".to_string());
+                                            break;
+                                        },
+                                        _ => {}
+                                    }
+                                }
+                            } else {
+                                // Check for simple tag matches
+                                match tag_lower.as_str() {
+                                    "lora" | "qlora" => {
+                                        relation = Some("lora".to_string());
+                                        break;
+                                    },
+                                    "adapter" => {
+                                        relation = Some("adapter".to_string());
+                                        break;
+                                    },
+                                    "instruction-tuning" | "chat" => {
+                                        relation = Some("finetuned".to_string());
+                                        break;
+                                    },
+                                    "distillation" => {
+                                        relation = Some("distilled".to_string());
+                                        break;
+                                    },
+                                    "onnx" | "tensorrt" => {
+                                        relation = Some("converted".to_string());
+                                        break;
+                                    },
+                                    "pruning" => {
+                                        relation = Some("pruned".to_string());
+                                        break;
+                                    },
+                                    _ => {}
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Check for merge indicators (multiple base models or merge tags)
+                    if relation.is_none() {
+                        let is_merge = if let Some(base_model_array) = base_model.as_array() {
+                            base_model_array.len() > 1
+                        } else {
+                            false
+                        } || model_info.tags.iter().any(|tag| tag.to_lowercase().contains("merge"));
+                        
+                        if is_merge {
+                            relation = Some("merged".to_string());
+                        }
+                    }
+                    
+                    // Check model name patterns for common relations
+                    if relation.is_none() {
+                        let model_name = model_info.model_id.to_lowercase();
+                        if model_name.contains("gguf") || model_name.contains("gptq") || model_name.contains("awq") || model_name.contains("int4") || model_name.contains("int8") {
+                            relation = Some("quantized".to_string());
+                        } else if model_name.contains("lora") || model_name.contains("qlora") {
+                            relation = Some("lora".to_string());
+                        } else if model_name.contains("adapter") {
+                            relation = Some("adapter".to_string());
+                        } else if model_name.contains("merge") {
+                            relation = Some("merged".to_string());
+                        } else if model_name.contains("finetune") || model_name.contains("ft") {
+                            relation = Some("finetuned".to_string());
+                        } else if model_name.contains("instruct") || model_name.contains("chat") {
+                            relation = Some("finetuned".to_string());
+                        } else if model_name.contains("distil") {
+                            relation = Some("distilled".to_string());
+                        } else if model_name.contains("onnx") {
+                            relation = Some("converted".to_string());
+                        } else if model_name.contains("prune") {
+                            relation = Some("pruned".to_string());
+                        }
+                    }
+                }
+                
                 if let Some(base_model_str) = base_model.as_str() {
-                    dependencies.push(base_model_str.to_string());
+                    dependencies.push((base_model_str.to_string(), relation.clone()));
+                    println!("Found base_model dependency: {} (relation: {:?})", base_model_str, relation);
+                } else if let Some(base_model_array) = base_model.as_array() {
+                    for base_model_item in base_model_array {
+                        if let Some(base_model_str) = base_model_item.as_str() {
+                            dependencies.push((base_model_str.to_string(), relation.clone()));
+                            println!("Found base_model dependency: {} (relation: {:?})", base_model_str, relation);
+                        }
+                    }
+                }
+            }
+            
+            // Check for parent_model field (some models use this)
+            if let Some(parent_model) = card_data.get("parent_model") {
+                if let Some(parent_model_str) = parent_model.as_str() {
+                    dependencies.push((parent_model_str.to_string(), Some("parent".to_string())));
+                    println!("Found parent_model dependency: {}", parent_model_str);
                 }
             }
         }
 
-        // Add known dependencies based on model family knowledge
-        // DialoGPT models have a hierarchical relationship
-        if model_info.model_id.contains("DialoGPT-medium") {
-            dependencies.push("microsoft/DialoGPT-base".to_string());
-        } else if model_info.model_id.contains("DialoGPT-large") {
-            dependencies.push("microsoft/DialoGPT-medium".to_string());
-            dependencies.push("microsoft/DialoGPT-base".to_string());
+        // Remove duplicates and self-references
+        dependencies.sort_by(|a, b| a.0.cmp(&b.0));
+        dependencies.dedup();
+        dependencies.retain(|(dep, _)| dep != &model_info.model_id);
+
+        // Log warning if no dependencies found
+        if dependencies.is_empty() {
+            println!("Warning: No explicit dependencies found for model: {}. Consider adding base_model, parent_model, or dependencies fields to the model card.", model_info.model_id);
         }
 
         dependencies
@@ -384,25 +541,25 @@ impl AIBOMGenerator {
 
         // Process dependent models
         let mut processed_dependencies = Vec::new();
-        for dep_model in &dependencies {
+        for (dep_model, relation) in &dependencies {
             if !self.processed_models.contains(dep_model) {
                 match self.process_model_recursively(dep_model) {
                     Ok(_) => {
                         // Use the same PURL format
                         let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                        processed_dependencies.push(dep_purl);
+                        processed_dependencies.push((dep_purl, relation.clone()));
                     }
                     Err(e) => {
                         println!("Warning: Failed to process dependency {}: {}", dep_model, e);
                         // Still add the dependency reference even if we couldn't fetch details
                         let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                        processed_dependencies.push(dep_purl);
+                        processed_dependencies.push((dep_purl, relation.clone()));
                     }
                 }
             } else {
                 // Use the same PURL format
                 let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                processed_dependencies.push(dep_purl);
+                processed_dependencies.push((dep_purl, relation.clone()));
             }
         }
 
@@ -433,7 +590,11 @@ impl AIBOMGenerator {
             .iter()
             .map(|(model_ref, deps)| Dependency {
                 reference: model_ref.clone(),
-                depends_on: deps.clone(),
+                depends_on: deps.iter().map(|(dep_ref, relation)| DependencyReference {
+                    reference: dep_ref.clone(),
+                    relation: relation.clone(),
+                    scope: Some("required".to_string()),
+                }).collect(),
             })
             .collect();
 
