@@ -2,6 +2,22 @@
 
 A Rust tool for generating AI Bill of Materials (AIBOM) for machine learning models, supporting both CLI and HTTP server usage modes.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Feature Highlights](#feature-highlights)
+- [CLI Options](#cli-options)
+- [API Documentation](#api-documentation)
+- [Examples](#examples)
+- [Dependency Extraction](#dependency-extraction)
+- [Model Relationships](#model-relationships)
+- [Development](#development)
+- [License](#license)
+
 ## Overview
 
 This project generates comprehensive AI Bill of Materials (AIBOM) documents for HuggingFace models, following the CycloneDX 1.6 specification. It extracts model metadata, dependencies, and creates structured documentation for AI model supply chain transparency.
@@ -50,7 +66,7 @@ curl -X POST http://localhost:8080/generate \
 curl http://localhost:8080/health
 ```
 
-## Features
+## Key Features
 
 - 🤖 HuggingFace model AIBOM generation
 - 📋 CycloneDX 1.6 specification compliance
@@ -59,6 +75,152 @@ curl http://localhost:8080/health
 - 📝 Detailed model metadata extraction
 - 🔄 Recursive dependency processing
 - ⚡ Fast and efficient Rust implementation
+- 📄 Custom license detection and normalization
+- 🗂️ Training dataset dependency tracking
+- 🔗 Model relationship mapping (adapter, fine-tuned, etc.)
+
+## Feature Highlights
+
+### 1. Custom License Detection
+
+The tool can detect and normalize both SPDX and custom licenses from model metadata:
+
+```bash
+cargo run -p cli -- tencent/HunyuanWorld-Voyager --verbose
+```
+
+**Output highlights:**
+```json
+{
+  "licenses": [
+    {
+      "license": {
+        "name": "**Custom Tencent License**",
+        "url": "https://huggingface.co/tencent/HunyuanWorld-Voyager/resolve/main/LICENSE"
+      }
+    }
+  ]
+}
+```
+
+### 2. Model Dependency Relationships
+
+Automatically discovers and maps complex model relationships including base models, adapters, and training datasets:
+
+```bash
+cargo run -p cli -- aeevnn/NaveenBhav --verbose
+```
+
+**Complete Output:**
+```json
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:12345678-1234-5678-9abc-123456789abc",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-01-01T00:00:00Z",
+    "tools": {
+      "components": [
+        {
+          "bom-ref": "pkg:generic/rust-aibom-generator@1.0.0",
+          "type": "application",
+          "name": "rust-aibom-generator",
+          "version": "1.0"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "pkg:generic/aeevnn%2FNaveenBhav@1.0",
+      "name": "NaveenBhav"
+    }
+  },
+  "components": [
+    {
+      "type": "data",
+      "bom-ref": "**pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0**",
+      "name": "Llama-Nemotron-VLM-Dataset-v1",
+      "group": "nvidia",
+      "description": "Training dataset"
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
+      "name": "DeepSeek-V3.1-Base",
+      "modelCard": {
+        "modelParameters": {
+          "properties": [
+            {
+              "name": "**ai.model.relation**",
+              "value": "**adapter**"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "machine-learning-model", 
+      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
+      "name": "Llama-3.1-8B-Instruct",
+      "modelCard": {
+        "modelParameters": {
+          "properties": [
+            {
+              "name": "**ai.model.relation**",
+              "value": "**adapter**"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "**dependencies**": [
+    {
+      "ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
+      "**dependsOn**": [
+        "**pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0**",
+        "**pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0**",
+        "**pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0**"
+      ]
+    },
+    {
+      "ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0", 
+      "dependsOn": [
+        "pkg:huggingface/meta-llama/Meta-Llama-3.1-8B@1.0"
+      ]
+    }
+  ]
+}
+```
+
+**Key Features Demonstrated:**
+- **Training Dataset Detection**: Automatically identifies `nvidia/Llama-Nemotron-VLM-Dataset-v1` as training data
+- **Model Relationships**: Maps adapter relationships in `modelCard.modelParameters.properties`
+- **CycloneDX 1.6 Compliance**: Simple string arrays in `dependsOn` instead of complex objects
+- **Recursive Dependencies**: Follows the full dependency chain (NaveenBhav → Llama-3.1-8B-Instruct → Meta-Llama-3.1-8B)
+
+### Model Relationship Representation
+
+Model relationships are stored in the `modelCard.modelParameters.properties` section using the standardized property:
+
+```json
+{
+  "name": "ai.model.relation",
+  "value": "adapter"
+}
+```
+
+**Supported Relationship Types:**
+- `adapter` - LoRA adapters, parameter-efficient fine-tuning
+- `finetuned` - Instruction-tuned, domain-specific models  
+- `quantized` - GGUF, GPTQ, AWQ quantized models
+- `merged` - Model merging, ensemble models
+- `distilled` - Knowledge distillation
+- `converted` - ONNX, TensorRT conversions
+- `pruned` - Structured/unstructured pruning
+
+This approach follows CycloneDX 1.6 best practices by separating relationship metadata from dependency structure, ensuring both standards compliance and rich AI governance metadata.
 
 ## CLI Options
 
@@ -110,6 +272,14 @@ cargo run -p cli -- microsoft/DialoGPT-medium
 
 For detailed information, see [DEPENDENCY_EXTRACTION.md](DEPENDENCY_EXTRACTION.md).
 
+## Model Relationships
+
+Model relationships (adapter, fine-tuned, quantized, etc.) are stored in the `modelCard.modelParameters.properties` section using the standardized property `ai.model.relation`. This approach follows CycloneDX 1.6 best practices by separating relationship metadata from dependency structure.
+
+For comprehensive documentation on model relationships, see:
+- [MODEL_RELATIONSHIPS.md](MODEL_RELATIONSHIPS.md) - Complete guide to model relationship representation
+- [FEATURE_SHOWCASE.md](FEATURE_SHOWCASE.md) - Real examples with detailed explanations
+
 ## Development
 
 ```bash
@@ -125,4 +295,4 @@ cargo clippy
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
