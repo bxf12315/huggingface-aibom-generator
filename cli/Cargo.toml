@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 lib = { path = "../lib" }
+clap = { version = "4.0", features = ["derive"] }
+env_logger = "0.10"
+serde_yaml = "0.9"
 hf-hub = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
