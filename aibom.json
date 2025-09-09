@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:0358c54e-d4e2-4611-9e94-647470c09e46",
+  "serialNumber": "urn:uuid:f745fa8b-8ff4-4349-90d1-3eb40a6b8f4f",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-09T02:20:30.169295+00:00",
+    "timestamp": "2025-09-09T04:36:44.452588+00:00",
     "tools": {
       "components": [
         {
@@ -20,12 +20,12 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/microsoft%2FDialoGPT-medium@1.0",
-      "name": "DialoGPT-medium",
+      "bom-ref": "pkg:generic/Zakomako4567%2Fzewai1@1.0",
+      "name": "zewai1",
       "version": "1.0",
       "description": "No description available",
       "copyright": "NOASSERTION",
-      "purl": "pkg:generic/microsoft%2FDialoGPT-medium@1.0"
+      "purl": "pkg:generic/Zakomako4567%2Fzewai1@1.0"
     },
     "properties": [
       {
@@ -34,34 +34,34 @@
       },
       {
         "name": "suppliedBy",
-        "value": "microsoft"
+        "value": "Zakomako4567"
       }
     ]
   },
   "components": [
     {
       "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
-      "name": "DialoGPT-medium",
+      "bom-ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
+      "name": "DeepSeek-V3.1-Base",
       "version": "1.0",
       "description": "No description available",
-      "group": "microsoft",
-      "publisher": "microsoft",
+      "group": "deepseek-ai",
+      "publisher": "deepseek-ai",
       "supplier": {
-        "name": "microsoft",
+        "name": "deepseek-ai",
         "url": [
-          "https://huggingface.co/microsoft"
+          "https://huggingface.co/deepseek-ai"
         ]
       },
       "manufacturer": {
-        "name": "microsoft",
+        "name": "deepseek-ai",
         "url": [
-          "https://huggingface.co/microsoft"
+          "https://huggingface.co/deepseek-ai"
         ]
       },
       "authors": [
         {
-          "name": "microsoft"
+          "name": "deepseek-ai"
         }
       ],
       "copyright": "NOASSERTION",
@@ -77,14 +77,14 @@
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/microsoft/DialoGPT-medium"
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base"
         }
       ],
-      "purl": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "purl": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
       "modelCard": {
         "modelParameters": {
           "architectureFamily": "transformer",
-          "modelArchitecture": "GPT2LMHeadModel",
+          "modelArchitecture": "TransformerModel",
           "task": "text-generation",
           "inputs": [
             {
@@ -108,7 +108,7 @@
           },
           {
             "name": "serialNumber",
-            "value": "urn:uuid:microsoft-DialoGPT-medium"
+            "value": "urn:uuid:deepseek-ai-DeepSeek-V3.1-Base"
           },
           {
             "name": "version",
@@ -120,7 +120,7 @@
           },
           {
             "name": "suppliedBy",
-            "value": "microsoft"
+            "value": "deepseek-ai"
           },
           {
             "name": "typeOfModel",
@@ -128,11 +128,103 @@
           },
           {
             "name": "downloadLocation",
-            "value": "https://huggingface.co/microsoft/DialoGPT-medium/tree/main"
+            "value": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main"
           },
           {
             "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-medium\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/microsoft/DialoGPT-medium/tree/main\", \"comment\": \"Model files\"}]"
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main\", \"comment\": \"Model files\"}]"
+          }
+        ],
+        "quantitativeAnalysis": {
+          "graphics": {}
+        }
+      }
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/Zakomako4567/zewai1@1.0",
+      "name": "zewai1",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "Zakomako4567",
+      "publisher": "Zakomako4567",
+      "supplier": {
+        "name": "Zakomako4567",
+        "url": [
+          "https://huggingface.co/Zakomako4567"
+        ]
+      },
+      "manufacturer": {
+        "name": "Zakomako4567",
+        "url": [
+          "https://huggingface.co/Zakomako4567"
+        ]
+      },
+      "authors": [
+        {
+          "name": "Zakomako4567"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/Zakomako4567/zewai1"
+        }
+      ],
+      "purl": "pkg:huggingface/Zakomako4567/zewai1@1.0",
+      "modelCard": {
+        "modelParameters": {
+          "architectureFamily": "transformer",
+          "modelArchitecture": "GPT2LMHeadModel",
+          "task": "text-classification",
+          "inputs": [
+            {
+              "format": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "generated-text"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "bomFormat",
+            "value": "CycloneDX"
+          },
+          {
+            "name": "specVersion",
+            "value": "1.6"
+          },
+          {
+            "name": "serialNumber",
+            "value": "urn:uuid:Zakomako4567-zewai1"
+          },
+          {
+            "name": "version",
+            "value": "1.0.0"
+          },
+          {
+            "name": "primaryPurpose",
+            "value": "text-classification"
+          },
+          {
+            "name": "suppliedBy",
+            "value": "Zakomako4567"
+          },
+          {
+            "name": "typeOfModel",
+            "value": "transformer"
+          },
+          {
+            "name": "downloadLocation",
+            "value": "https://huggingface.co/Zakomako4567/zewai1/tree/main"
+          },
+          {
+            "name": "external_references",
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/Zakomako4567/zewai1\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/Zakomako4567/zewai1/tree/main\", \"comment\": \"Model files\"}]"
           }
         ],
         "quantitativeAnalysis": {
@@ -143,16 +235,20 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:huggingface/microsoft/DialoGPT-medium@1.0",
+      "ref": "pkg:huggingface/Zakomako4567/zewai1@1.0",
       "dependsOn": [
-        "pkg:huggingface/microsoft/DialoGPT-base@1.0"
+        {
+          "ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
+          "relation": "finetuned",
+          "scope": "required"
+        }
       ]
     }
   ],
   "externalReferences": [
     {
       "type": "distribution",
-      "url": "https://huggingface.co/microsoft/DialoGPT-medium"
+      "url": "https://huggingface.co/Zakomako4567/zewai1"
     }
   ]
 }
