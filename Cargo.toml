@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "lib",
+    "cli", 
+    "server"
+]
+resolver = "2"
+
+[workspace.dependencies]
+hf-hub = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4"] }
+reqwest = { version = "0.11", features = ["json", "blocking"] }
