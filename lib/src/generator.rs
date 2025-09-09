@@ -39,88 +39,26 @@ impl AIBOMGenerator {
 
         let url = format!("https://huggingface.co/api/models/{}", model_id);
 
-        println!("Attempting to fetch model info from: {}", url);
+        println!("Fetching model info from: {}", url);
 
-        match client
+        let response = client
             .get(&url)
             .header("User-Agent", "rust-aibom-generator/1.0")
-            .send()
-        {
-            Ok(response) => {
-                if response.status().is_success() {
-                    match response.json::<ModelInfo>() {
-                        Ok(model_info) => {
-                            println!("Successfully fetched model info from HuggingFace API");
-                            Ok(model_info)
-                        }
-                        Err(e) => {
-                            println!("Failed to parse JSON response: {}", e);
-                            self.create_fallback_model_info(model_id)
-                        }
-                    }
-                } else {
-                    println!("API request failed with status: {}", response.status());
-                    self.create_fallback_model_info(model_id)
-                }
-            }
-            Err(e) => {
-                println!("Network request failed: {}", e);
-                println!("Using fallback model info for: {}", model_id);
-                self.create_fallback_model_info(model_id)
-            }
+            .send()?;
+
+        if !response.status().is_success() {
+            return Err(format!("API request failed with status: {}", response.status()).into());
         }
-    }
 
-    fn create_fallback_model_info(
-        &self,
-        model_id: &str,
-    ) -> Result<ModelInfo, Box<dyn std::error::Error>> {
-        // Infer basic information based on model ID
-        let tags = if model_id.contains("gpt")
-            || model_id.contains("llama")
-            || model_id.contains("mistral")
-        {
-            vec![
-                "transformers".to_string(),
-                "pytorch".to_string(),
-                "text-generation".to_string(),
-            ]
-        } else if model_id.contains("bert") {
-            vec![
-                "transformers".to_string(),
-                "pytorch".to_string(),
-                "fill-mask".to_string(),
-            ]
-        } else if model_id.contains("clip") {
-            vec![
-                "transformers".to_string(),
-                "pytorch".to_string(),
-                "feature-extraction".to_string(),
-            ]
-        } else {
-            vec![
-                "transformers".to_string(),
-                "pytorch".to_string(),
-                "text-generation".to_string(),
-            ]
-        };
-
-        Ok(ModelInfo {
-            model_id: model_id.to_string(),
-            tags,
-            library_name: Some("transformers".to_string()),
-            created_at: Some("2023-01-01T00:00:00.000Z".to_string()),
-            last_modified: Some("2024-06-01T00:00:00.000Z".to_string()),
-            license: Some("apache-2.0".to_string()),
-            card_data: None,
-            siblings: None,
-            sha: Some("fallback_sha".to_string()),
-        })
+        let model_info = response.json::<ModelInfo>()?;
+        println!("Successfully fetched model info for: {}", model_id);
+        Ok(model_info)
     }
 
     fn extract_dependencies(&self, model_info: &ModelInfo) -> Vec<String> {
         let mut dependencies = Vec::new();
 
+        // Extract dependencies from model card data
         if let Some(card_data) = &model_info.card_data {
             if let Some(base_model) = card_data.get("base_model") {
                 if let Some(base_model_str) = base_model.as_str() {
@@ -129,38 +67,98 @@ impl AIBOMGenerator {
             }
         }
 
-        // Add known dependencies for DialoGPT series
+        // Add known dependencies based on model family knowledge
+        // DialoGPT models have a hierarchical relationship
         if model_info.model_id.contains("DialoGPT-medium") {
+            dependencies.push("microsoft/DialoGPT-base".to_string());
+        } else if model_info.model_id.contains("DialoGPT-large") {
+            dependencies.push("microsoft/DialoGPT-medium".to_string());
             dependencies.push("microsoft/DialoGPT-base".to_string());
         }
 
         dependencies
     }
 
-    fn normalize_license(&self, license: &str) -> LicenseInfo {
-        let normalized = license.to_lowercase();
-        match normalized.as_str() {
-            "mit" => LicenseInfo {
-                id: Some("MIT".to_string()),
-                name: None,
-                url: Some("https://spdx.org/licenses/MIT.html".to_string()),
-            },
-            "apache-2.0" | "apache 2.0" => LicenseInfo {
-                id: Some("Apache-2.0".to_string()),
-                name: None,
-                url: Some("https://spdx.org/licenses/Apache-2.0.html".to_string()),
-            },
-            "bsd-3-clause" => LicenseInfo {
-                id: Some("BSD-3-Clause".to_string()),
-                name: None,
-                url: Some("https://spdx.org/licenses/BSD-3-Clause.html".to_string()),
-            },
-            _ => LicenseInfo {
-                id: Some("MIT".to_string()), // Default to MIT instead of unknown
-                name: None,
-                url: Some("https://spdx.org/licenses/MIT.html".to_string()),
-            },
+    fn normalize_license(&self, license: &str, model_id: &str) -> Option<LicenseInfo> {
+        // Try different normalization strategies to find a valid SPDX license ID
+        let variations = [
+            license.to_string(),                      // Original
+            license.to_lowercase(),                   // Lowercase
+            license.to_uppercase(),                   // Uppercase
+            license.to_lowercase().replace(" ", "-"), // Lowercase with dashes
+            license.to_lowercase().replace("-", " "), // Lowercase with spaces
+            license.replace(" ", "-"),                // Original with dashes
+            license.replace("-", " "),                // Original with spaces
+        ];
+
+        // Check each variation against SPDX license IDs
+        for variant in &variations {
+            if let Some(spdx_license) = spdx::license_id(variant) {
+                return Some(LicenseInfo {
+                    id: Some(spdx_license.name.to_string()),
+                    name: Some(spdx_license.full_name.to_string()),
+                    url: Some(format!("https://spdx.org/licenses/{}", spdx_license.name)),
+                    text: None,
+                });
+            }
         }
+
+        // If not found in SPDX, try to read LICENSE file from HuggingFace repo
+        if let Ok(license_text) = self.fetch_license_file(model_id) {
+            return Some(LicenseInfo {
+                id: None,
+                name: Some(license.to_string()),
+                url: None,
+                text: Some(license_text),
+            });
+        }
+
+        // If no license information is available, return None
+        None
+    }
+
+    fn fetch_license_file(&self, model_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        use reqwest::blocking::Client;
+        use std::time::Duration;
+
+        let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
+
+        // Try common LICENSE file names
+        let license_files = [
+            "LICENSE",
+            "LICENSE.txt",
+            "LICENSE.md",
+            "license",
+            "license.txt",
+        ];
+
+        for filename in &license_files {
+            let url = format!(
+                "https://huggingface.co/{}/resolve/main/{}",
+                model_id, filename
+            );
+
+            if let Ok(response) = client
+                .get(&url)
+                .header("User-Agent", "rust-aibom-generator/1.0")
+                .send()
+            {
+                if response.status().is_success() {
+                    if let Ok(text) = response.text() {
+                        // Basic validation that this looks like a license file
+                        if text.len() > 50
+                            && (text.to_lowercase().contains("license")
+                                || text.to_lowercase().contains("copyright")
+                                || text.to_lowercase().contains("permission"))
+                        {
+                            return Ok(text);
+                        }
+                    }
+                }
+            }
+        }
+
+        Err("No LICENSE file found".into())
     }
 
     fn extract_organization_from_model_id(&self, model_id: &str) -> (String, String) {
@@ -211,20 +209,47 @@ impl AIBOMGenerator {
     }
 
     fn get_model_architecture(&self, model_info: &ModelInfo) -> String {
-        // Infer architecture from model ID or tags
-        let model_name = &model_info.model_id;
-
-        if model_name.contains("DialoGPT") {
-            "DialoGPTForCausalLM".to_string()
-        } else if model_name.contains("GPT") {
-            "GPTForCausalLM".to_string()
-        } else if model_name.contains("BERT") {
-            "BertModel".to_string()
-        } else if model_name.contains("T5") {
-            "T5ForConditionalGeneration".to_string()
-        } else {
-            "TransformerModel".to_string()
+        // Try to extract architecture from model card data
+        if let Some(card_data) = &model_info.card_data {
+            if let Some(architecture) = card_data.get("architecture") {
+                if let Some(arch_str) = architecture.as_str() {
+                    return arch_str.to_string();
+                }
+            }
+            // Also check for architectures array in config
+            if let Some(architectures) = card_data.get("architectures") {
+                if let Some(arch_array) = architectures.as_array() {
+                    if let Some(first_arch) = arch_array.first() {
+                        if let Some(arch_str) = first_arch.as_str() {
+                            return arch_str.to_string();
+                        }
+                    }
+                }
+            }
         }
+
+        // Check tags for architecture information
+        for tag in &model_info.tags {
+            if tag.contains("gpt2") || tag.contains("gpt") {
+                return "GPT2LMHeadModel".to_string();
+            } else if tag.contains("bert") {
+                return "BertModel".to_string();
+            } else if tag.contains("t5") {
+                return "T5ForConditionalGeneration".to_string();
+            }
+        }
+
+        // Default to generic transformer if no specific architecture found
+        "TransformerModel".to_string()
+    }
+
+    fn extract_license_from_tags(&self, tags: &[String]) -> Option<String> {
+        for tag in tags {
+            if tag.starts_with("license:") {
+                return Some(tag.strip_prefix("license:").unwrap().to_string());
+            }
+        }
+        None
     }
 
     fn model_info_to_component(&self, model_info: &ModelInfo) -> Component {
@@ -232,6 +257,10 @@ impl AIBOMGenerator {
         let version = "1.0".to_string();
         let purl = format!("pkg:huggingface/{}@{}", model_info.model_id, version);
         let bom_ref = purl.clone();
+
+        // Extract license from tags if not available in license field
+        let license_str = model_info.license.clone()
+            .or_else(|| self.extract_license_from_tags(&model_info.tags));
 
         // Create ModelCard
         let model_card = if self.is_machine_learning_model(&model_info.tags) {
@@ -321,10 +350,13 @@ impl AIBOMGenerator {
             }),
             authors: Some(vec![Author { name: org.clone() }]),
             copyright: Some("NOASSERTION".to_string()),
-            licenses: model_info.license.as_ref().map(|license| {
-                vec![License {
-                    license: self.normalize_license(license),
-                }]
+            licenses: license_str.as_ref().and_then(|license| {
+                self.normalize_license(license, &model_info.model_id)
+                    .map(|license_info| {
+                        vec![License {
+                            license: license_info,
+                        }]
+                    })
             }),
             external_references: Some(vec![ExternalReference {
                 ref_type: "website".to_string(),
@@ -354,11 +386,24 @@ impl AIBOMGenerator {
         let mut processed_dependencies = Vec::new();
         for dep_model in &dependencies {
             if !self.processed_models.contains(dep_model) {
-                self.process_model_recursively(dep_model)?;
+                match self.process_model_recursively(dep_model) {
+                    Ok(_) => {
+                        // Use the same PURL format
+                        let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
+                        processed_dependencies.push(dep_purl);
+                    }
+                    Err(e) => {
+                        println!("Warning: Failed to process dependency {}: {}", dep_model, e);
+                        // Still add the dependency reference even if we couldn't fetch details
+                        let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
+                        processed_dependencies.push(dep_purl);
+                    }
+                }
+            } else {
+                // Use the same PURL format
+                let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
+                processed_dependencies.push(dep_purl);
             }
-            // Use the same PURL format
-            let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-            processed_dependencies.push(dep_purl);
         }
 
         // Create component
@@ -458,5 +503,91 @@ impl AIBOMGenerator {
         };
 
         Ok(aibom)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_extract_license_from_tags() {
+        let generator = AIBOMGenerator::new().unwrap();
+        
+        let tags = vec![
+            "transformers".to_string(),
+            "pytorch".to_string(),
+            "license:mit".to_string(),
+            "text-generation".to_string(),
+        ];
+        
+        let license = generator.extract_license_from_tags(&tags);
+        assert_eq!(license, Some("mit".to_string()));
+    }
+
+    #[test]
+    fn test_extract_dependencies_dialogpt() {
+        let generator = AIBOMGenerator::new().unwrap();
+        
+        let model_info = ModelInfo {
+            model_id: "microsoft/DialoGPT-medium".to_string(),
+            tags: vec!["transformers".to_string(), "gpt2".to_string()],
+            library_name: Some("transformers".to_string()),
+            created_at: None,
+            last_modified: None,
+            license: None,
+            card_data: None,
+            siblings: None,
+            sha: None,
+        };
+        
+        let dependencies = generator.extract_dependencies(&model_info);
+        assert!(dependencies.contains(&"microsoft/DialoGPT-base".to_string()));
+    }
+
+    #[test]
+    fn test_get_model_architecture_from_tags() {
+        let generator = AIBOMGenerator::new().unwrap();
+        
+        let model_info = ModelInfo {
+            model_id: "microsoft/DialoGPT-medium".to_string(),
+            tags: vec!["transformers".to_string(), "gpt2".to_string()],
+            library_name: Some("transformers".to_string()),
+            created_at: None,
+            last_modified: None,
+            license: None,
+            card_data: None,
+            siblings: None,
+            sha: None,
+        };
+        
+        let architecture = generator.get_model_architecture(&model_info);
+        assert_eq!(architecture, "GPT2LMHeadModel");
+    }
+
+    #[test]
+    fn test_get_model_architecture_from_card_data() {
+        let generator = AIBOMGenerator::new().unwrap();
+        
+        let card_data = json!({
+            "architectures": ["GPT2LMHeadModel"],
+            "model_type": "gpt2"
+        });
+        
+        let model_info = ModelInfo {
+            model_id: "microsoft/DialoGPT-medium".to_string(),
+            tags: vec!["transformers".to_string()],
+            library_name: Some("transformers".to_string()),
+            created_at: None,
+            last_modified: None,
+            license: None,
+            card_data: Some(card_data),
+            siblings: None,
+            sha: None,
+        };
+        
+        let architecture = generator.get_model_architecture(&model_info);
+        assert_eq!(architecture, "GPT2LMHeadModel");
     }
 }
