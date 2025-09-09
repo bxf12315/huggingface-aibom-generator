@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:a18191a7-353b-4dc2-9d2c-342b07c620e4",
+  "serialNumber": "urn:uuid:20cea7e0-c54f-4197-88c4-01a417234066",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-09-09T06:54:59.703471+00:00",
+    "timestamp": "2025-09-09T08:36:16.070389+00:00",
     "tools": {
       "components": [
         {
@@ -20,12 +20,12 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:generic/brrski%2Fbrenner@1.0",
-      "name": "brenner",
+      "bom-ref": "pkg:generic/aeevnn%2FNaveenBhav@1.0",
+      "name": "NaveenBhav",
       "version": "1.0",
       "description": "No description available",
       "copyright": "NOASSERTION",
-      "purl": "pkg:generic/brrski%2Fbrenner@1.0"
+      "purl": "pkg:generic/aeevnn%2FNaveenBhav@1.0"
     },
     "properties": [
       {
@@ -34,50 +34,15 @@
       },
       {
         "name": "suppliedBy",
-        "value": "brrski"
+        "value": "aeevnn"
       }
     ]
   },
   "components": [
     {
       "type": "data",
-      "bom-ref": "pkg:huggingface-dataset/Anthropic/values-in-the-wild@1.0",
-      "name": "values-in-the-wild",
-      "version": "1.0",
-      "description": "Training dataset",
-      "group": "Anthropic",
-      "publisher": "Anthropic",
-      "supplier": {
-        "name": "Anthropic",
-        "url": [
-          "https://huggingface.co/datasets/Anthropic"
-        ]
-      },
-      "manufacturer": {
-        "name": "Anthropic",
-        "url": [
-          "https://huggingface.co/datasets/Anthropic"
-        ]
-      },
-      "authors": [
-        {
-          "name": "Anthropic"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/datasets/Anthropic/values-in-the-wild",
-          "comment": "Dataset repository"
-        }
-      ],
-      "purl": "pkg:huggingface-dataset/Anthropic/values-in-the-wild@1.0"
-    },
-    {
-      "type": "data",
-      "bom-ref": "pkg:huggingface-dataset/nvidia/OpenCodeReasoning@1.0",
-      "name": "OpenCodeReasoning",
+      "bom-ref": "pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0",
+      "name": "Llama-Nemotron-VLM-Dataset-v1",
       "version": "1.0",
       "description": "Training dataset",
       "group": "nvidia",
@@ -103,123 +68,53 @@
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/datasets/nvidia/OpenCodeReasoning",
+          "url": "https://huggingface.co/datasets/nvidia/Llama-Nemotron-VLM-Dataset-v1",
           "comment": "Dataset repository"
         }
       ],
-      "purl": "pkg:huggingface-dataset/nvidia/OpenCodeReasoning@1.0"
-    },
-    {
-      "type": "data",
-      "bom-ref": "pkg:huggingface-dataset/nvidia/Granary@1.0",
-      "name": "Granary",
-      "version": "1.0",
-      "description": "Training dataset",
-      "group": "nvidia",
-      "publisher": "nvidia",
-      "supplier": {
-        "name": "nvidia",
-        "url": [
-          "https://huggingface.co/datasets/nvidia"
-        ]
-      },
-      "manufacturer": {
-        "name": "nvidia",
-        "url": [
-          "https://huggingface.co/datasets/nvidia"
-        ]
-      },
-      "authors": [
-        {
-          "name": "nvidia"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/datasets/nvidia/Granary",
-          "comment": "Dataset repository"
-        }
-      ],
-      "purl": "pkg:huggingface-dataset/nvidia/Granary@1.0"
-    },
-    {
-      "type": "data",
-      "bom-ref": "pkg:huggingface-dataset/nvidia/nemo-asr-set-3.0@1.0",
-      "name": "nemo-asr-set-3.0",
-      "version": "1.0",
-      "description": "Training dataset",
-      "group": "nvidia",
-      "publisher": "nvidia",
-      "supplier": {
-        "name": "nvidia",
-        "url": [
-          "https://huggingface.co/datasets/nvidia"
-        ]
-      },
-      "manufacturer": {
-        "name": "nvidia",
-        "url": [
-          "https://huggingface.co/datasets/nvidia"
-        ]
-      },
-      "authors": [
-        {
-          "name": "nvidia"
-        }
-      ],
-      "copyright": "NOASSERTION",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://huggingface.co/datasets/nvidia/nemo-asr-set-3.0",
-          "comment": "Dataset repository"
-        }
-      ],
-      "purl": "pkg:huggingface-dataset/nvidia/nemo-asr-set-3.0@1.0"
+      "purl": "pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0"
     },
     {
       "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
-      "name": "parakeet-tdt-0.6b-v2",
+      "bom-ref": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
+      "name": "DeepSeek-V3.1-Base",
       "version": "1.0",
       "description": "No description available",
-      "group": "nvidia",
-      "publisher": "nvidia",
+      "group": "deepseek-ai",
+      "publisher": "deepseek-ai",
       "supplier": {
-        "name": "nvidia",
+        "name": "deepseek-ai",
         "url": [
-          "https://huggingface.co/nvidia"
+          "https://huggingface.co/deepseek-ai"
         ]
       },
       "manufacturer": {
-        "name": "nvidia",
+        "name": "deepseek-ai",
         "url": [
-          "https://huggingface.co/nvidia"
+          "https://huggingface.co/deepseek-ai"
         ]
       },
       "authors": [
         {
-          "name": "nvidia"
+          "name": "deepseek-ai"
         }
       ],
       "copyright": "NOASSERTION",
       "licenses": [
         {
           "license": {
-            "id": "CC-BY-4.0",
-            "url": "https://spdx.org/licenses/CC-BY-4.0"
+            "id": "MIT",
+            "url": "https://spdx.org/licenses/MIT"
           }
         }
       ],
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2"
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base"
         }
       ],
-      "purl": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
+      "purl": "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
       "modelCard": {
         "modelParameters": {
           "architectureFamily": "transformer",
@@ -247,7 +142,7 @@
           },
           {
             "name": "serialNumber",
-            "value": "urn:uuid:nvidia-parakeet-tdt-0.6b-v2"
+            "value": "urn:uuid:deepseek-ai-DeepSeek-V3.1-Base"
           },
           {
             "name": "version",
@@ -259,7 +154,7 @@
           },
           {
             "name": "suppliedBy",
-            "value": "nvidia"
+            "value": "deepseek-ai"
           },
           {
             "name": "typeOfModel",
@@ -267,11 +162,15 @@
           },
           {
             "name": "downloadLocation",
-            "value": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2/tree/main"
+            "value": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main"
           },
           {
             "name": "external_references",
-            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2/tree/main\", \"comment\": \"Model files\"}]"
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/deepseek-ai/DeepSeek-V3.1-Base/tree/main\", \"comment\": \"Model files\"}]"
+          },
+          {
+            "name": "ai.model.relation",
+            "value": "adapter"
           }
         ],
         "quantitativeAnalysis": {
@@ -281,88 +180,267 @@
     },
     {
       "type": "machine-learning-model",
-      "bom-ref": "pkg:huggingface/brrski/brenner@1.0",
-      "name": "brenner",
+      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B@1.0",
+      "name": "Llama-3.1-8B",
       "version": "1.0",
       "description": "No description available",
-      "group": "brrski",
-      "publisher": "brrski",
+      "group": "meta-llama",
+      "publisher": "meta-llama",
       "supplier": {
-        "name": "brrski",
+        "name": "meta-llama",
         "url": [
-          "https://huggingface.co/brrski"
+          "https://huggingface.co/meta-llama"
         ]
       },
       "manufacturer": {
-        "name": "brrski",
+        "name": "meta-llama",
         "url": [
-          "https://huggingface.co/brrski"
+          "https://huggingface.co/meta-llama"
         ]
       },
       "authors": [
         {
-          "name": "brrski"
+          "name": "meta-llama"
         }
       ],
       "copyright": "NOASSERTION",
       "licenses": [
         {
           "license": {
-            "id": "MIT",
-            "url": "https://spdx.org/licenses/MIT"
+            "name": "llama3.1",
+            "url": "https://huggingface.co/meta-llama/Llama-3.1-8B/resolve/main/LICENSE"
           }
         }
       ],
       "externalReferences": [
         {
           "type": "website",
-          "url": "https://huggingface.co/brrski/brenner"
+          "url": "https://huggingface.co/meta-llama/Llama-3.1-8B"
         }
       ],
-      "purl": "pkg:huggingface/brrski/brenner@1.0"
+      "purl": "pkg:huggingface/meta-llama/Llama-3.1-8B@1.0",
+      "modelCard": {
+        "modelParameters": {
+          "architectureFamily": "transformer",
+          "modelArchitecture": "TransformerModel",
+          "task": "text-generation",
+          "inputs": [
+            {
+              "format": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "generated-text"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "bomFormat",
+            "value": "CycloneDX"
+          },
+          {
+            "name": "specVersion",
+            "value": "1.6"
+          },
+          {
+            "name": "serialNumber",
+            "value": "urn:uuid:meta-llama-Llama-3.1-8B"
+          },
+          {
+            "name": "version",
+            "value": "1.0.0"
+          },
+          {
+            "name": "primaryPurpose",
+            "value": "text-generation"
+          },
+          {
+            "name": "suppliedBy",
+            "value": "meta-llama"
+          },
+          {
+            "name": "typeOfModel",
+            "value": "transformer"
+          },
+          {
+            "name": "downloadLocation",
+            "value": "https://huggingface.co/meta-llama/Llama-3.1-8B/tree/main"
+          },
+          {
+            "name": "external_references",
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B/tree/main\", \"comment\": \"Model files\"}]"
+          },
+          {
+            "name": "ai.model.relation",
+            "value": "finetuned"
+          }
+        ],
+        "quantitativeAnalysis": {
+          "graphics": {}
+        }
+      }
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
+      "name": "Llama-3.1-8B-Instruct",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "meta-llama",
+      "publisher": "meta-llama",
+      "supplier": {
+        "name": "meta-llama",
+        "url": [
+          "https://huggingface.co/meta-llama"
+        ]
+      },
+      "manufacturer": {
+        "name": "meta-llama",
+        "url": [
+          "https://huggingface.co/meta-llama"
+        ]
+      },
+      "authors": [
+        {
+          "name": "meta-llama"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "licenses": [
+        {
+          "license": {
+            "name": "llama3.1",
+            "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/resolve/main/LICENSE"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct"
+        }
+      ],
+      "purl": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
+      "modelCard": {
+        "modelParameters": {
+          "architectureFamily": "transformer",
+          "modelArchitecture": "TransformerModel",
+          "task": "text-generation",
+          "inputs": [
+            {
+              "format": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "generated-text"
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "bomFormat",
+            "value": "CycloneDX"
+          },
+          {
+            "name": "specVersion",
+            "value": "1.6"
+          },
+          {
+            "name": "serialNumber",
+            "value": "urn:uuid:meta-llama-Llama-3.1-8B-Instruct"
+          },
+          {
+            "name": "version",
+            "value": "1.0.0"
+          },
+          {
+            "name": "primaryPurpose",
+            "value": "text-generation"
+          },
+          {
+            "name": "suppliedBy",
+            "value": "meta-llama"
+          },
+          {
+            "name": "typeOfModel",
+            "value": "transformer"
+          },
+          {
+            "name": "downloadLocation",
+            "value": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main"
+          },
+          {
+            "name": "external_references",
+            "value": "[{\"type\": \"website\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct\", \"comment\": \"Model repository\"}, {\"type\": \"distribution\", \"url\": \"https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main\", \"comment\": \"Model files\"}]"
+          },
+          {
+            "name": "ai.model.relation",
+            "value": "adapter"
+          }
+        ],
+        "quantitativeAnalysis": {
+          "graphics": {}
+        }
+      }
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
+      "name": "NaveenBhav",
+      "version": "1.0",
+      "description": "No description available",
+      "group": "aeevnn",
+      "publisher": "aeevnn",
+      "supplier": {
+        "name": "aeevnn",
+        "url": [
+          "https://huggingface.co/aeevnn"
+        ]
+      },
+      "manufacturer": {
+        "name": "aeevnn",
+        "url": [
+          "https://huggingface.co/aeevnn"
+        ]
+      },
+      "authors": [
+        {
+          "name": "aeevnn"
+        }
+      ],
+      "copyright": "NOASSERTION",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://huggingface.co/aeevnn/NaveenBhav"
+        }
+      ],
+      "purl": "pkg:huggingface/aeevnn/NaveenBhav@1.0"
     }
   ],
   "dependencies": [
     {
-      "ref": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
+      "ref": "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0",
       "dependsOn": [
-        {
-          "ref": "pkg:huggingface-dataset/nvidia/Granary@1.0",
-          "relation": "train",
-          "scope": "required"
-        },
-        {
-          "ref": "pkg:huggingface-dataset/nvidia/nemo-asr-set-3.0@1.0",
-          "relation": "train",
-          "scope": "required"
-        }
+        "pkg:huggingface/meta-llama/Meta-Llama-3.1-8B@1.0"
       ]
     },
     {
-      "ref": "pkg:huggingface/brrski/brenner@1.0",
+      "ref": "pkg:huggingface/aeevnn/NaveenBhav@1.0",
       "dependsOn": [
-        {
-          "ref": "pkg:huggingface-dataset/Anthropic/values-in-the-wild@1.0",
-          "relation": "train",
-          "scope": "required"
-        },
-        {
-          "ref": "pkg:huggingface-dataset/nvidia/OpenCodeReasoning@1.0",
-          "relation": "train",
-          "scope": "required"
-        },
-        {
-          "ref": "pkg:huggingface/nvidia/parakeet-tdt-0.6b-v2@1.0",
-          "relation": "adapter",
-          "scope": "required"
-        }
+        "pkg:huggingface-dataset/nvidia/Llama-Nemotron-VLM-Dataset-v1@1.0",
+        "pkg:huggingface/deepseek-ai/DeepSeek-V3.1-Base@1.0",
+        "pkg:huggingface/meta-llama/Llama-3.1-8B-Instruct@1.0"
       ]
     }
   ],
   "externalReferences": [
     {
       "type": "distribution",
-      "url": "https://huggingface.co/brrski/brenner"
+      "url": "https://huggingface.co/aeevnn/NaveenBhav"
     }
   ]
 }

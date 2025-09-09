@@ -1,4 +1,4 @@
-use crate::models::dependency::DependencyReference;
+// use crate::models::dependency::DependencyReference; // No longer needed
 use crate::*;
 use std::collections::{HashMap, HashSet};
 
@@ -6,7 +6,7 @@ pub struct AIBOMGenerator {
     api: hf_hub::api::sync::Api,
     processed_models: HashSet<String>,
     components: Vec<Component>,
-    dependencies: HashMap<String, Vec<(String, Option<String>)>>,
+    dependencies: HashMap<String, Vec<String>>, // Simplified to just dependency references
 }
 
 impl AIBOMGenerator {
@@ -487,7 +487,7 @@ impl AIBOMGenerator {
         }
     }
 
-    fn model_info_to_component(&self, model_info: &ModelInfo) -> Component {
+    fn model_info_to_component(&self, model_info: &ModelInfo, relation: Option<String>) -> Component {
         let (org, model_name) = self.extract_organization_from_model_id(&model_info.model_id);
         let version = "1.0".to_string();
         let purl = format!("pkg:huggingface/{}@{}", model_info.model_id, version);
@@ -505,7 +505,7 @@ impl AIBOMGenerator {
             let architecture = self.get_model_architecture(model_info);
 
             // Create properties array
-            let properties = vec![
+            let mut properties = vec![
                 Property {
                     name: "bomFormat".to_string(),
                     value: "CycloneDX".to_string(),
@@ -546,6 +546,14 @@ impl AIBOMGenerator {
                     ),
                 },
             ];
+
+            // Add relation information if available
+            if let Some(rel) = &relation {
+                properties.push(Property {
+                    name: "ai.model.relation".to_string(),
+                    value: rel.clone(),
+                });
+            }
 
             Some(ModelCard {
                 model_parameters: Some(ModelParameters {
@@ -608,6 +616,7 @@ impl AIBOMGenerator {
     fn process_model_recursively(
         &mut self,
         model_id: &str,
+        relation: Option<String>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         if self.processed_models.contains(model_id) {
             return Ok(());
@@ -631,48 +640,45 @@ impl AIBOMGenerator {
             }
         }
 
-        // Process dataset dependencies
+        // Process dataset dependencies - only add to dependency list, no relation stored
         let mut processed_dependencies = Vec::new();
-        for (dataset_id, relation) in dataset_dependencies {
+        for (dataset_id, _) in dataset_dependencies {
             let dataset_component = self.create_dataset_component(&dataset_id);
             let dep_purl = dataset_component.purl.clone().unwrap();
 
             // Add dataset component to components list
             self.components.push(dataset_component);
-            processed_dependencies.push((dep_purl, relation));
+            processed_dependencies.push(dep_purl);
             println!("Added dataset component: {}", dataset_id);
         }
 
-        // Process model dependencies
-        for (dep_model, relation) in model_dependencies {
+        // Process model dependencies and store their relations
+        for (dep_model, dep_relation) in model_dependencies {
             if !self.processed_models.contains(&dep_model) {
-                match self.process_model_recursively(&dep_model) {
+                match self.process_model_recursively(&dep_model, dep_relation.clone()) {
                     Ok(_) => {
-                        // Use the same PURL format
                         let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                        processed_dependencies.push((dep_purl, relation));
+                        processed_dependencies.push(dep_purl);
                     }
                     Err(e) => {
                         println!("Warning: Failed to process dependency {}: {}", dep_model, e);
-                        // Still add the dependency reference even if we couldn't fetch details
                         let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                        processed_dependencies.push((dep_purl, relation));
+                        processed_dependencies.push(dep_purl);
                     }
                 }
             } else {
-                // Use the same PURL format
                 let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                processed_dependencies.push((dep_purl, relation));
+                processed_dependencies.push(dep_purl);
             }
         }
 
-        // Create component
-        let component = self.model_info_to_component(&model_info);
+        // Create component with relation information
+        let component = self.model_info_to_component(&model_info, relation);
         let bom_ref = component.bom_ref.clone();
 
         self.components.push(component);
 
-        // Record dependencies
+        // Record dependencies (simplified structure)
         if !processed_dependencies.is_empty() {
             self.dependencies.insert(bom_ref, processed_dependencies);
         }
@@ -684,23 +690,16 @@ impl AIBOMGenerator {
         &mut self,
         main_model_id: &str,
     ) -> Result<AIBOM, Box<dyn std::error::Error>> {
-        // Process main model and all dependencies
-        self.process_model_recursively(main_model_id)?;
+        // Process main model and all dependencies (no relation for main model)
+        self.process_model_recursively(main_model_id, None)?;
 
-        // Generate dependency list
+        // Generate dependency list with simplified structure
         let dependencies: Vec<Dependency> = self
             .dependencies
             .iter()
             .map(|(model_ref, deps)| Dependency {
                 reference: model_ref.clone(),
-                depends_on: deps
-                    .iter()
-                    .map(|(dep_ref, relation)| DependencyReference {
-                        reference: dep_ref.clone(),
-                        relation: relation.clone(),
-                        scope: Some("required".to_string()),
-                    })
-                    .collect(),
+                depends_on: deps.clone(), // Now just Vec<String>
             })
             .collect();
 
@@ -911,6 +910,50 @@ mod tests {
         // This will return None since we can't find a license file URL in tests
         // But the logic for non-SPDX licenses is correct in the implementation
         assert!(license_info.is_none());
+    }
+
+    #[test]
+    fn test_model_relation_in_model_card() {
+        let generator = AIBOMGenerator::new().unwrap();
+        
+        let model_info = ModelInfo {
+            model_id: "test/adapter-model".to_string(),
+            tags: vec!["transformers".to_string(), "text-generation".to_string()],
+            library_name: Some("transformers".to_string()),
+            created_at: None,
+            last_modified: None,
+            license: None,
+            card_data: None,
+            siblings: None,
+            sha: None,
+        };
+
+        // Test with adapter relation
+        let component = generator.model_info_to_component(&model_info, Some("adapter".to_string()));
+        
+        assert!(component.model_card.is_some());
+        let model_card = component.model_card.unwrap();
+        assert!(model_card.properties.is_some());
+        
+        let properties = model_card.properties.unwrap();
+        let relation_property = properties.iter().find(|p| p.name == "ai.model.relation");
+        assert!(relation_property.is_some());
+        assert_eq!(relation_property.unwrap().value, "adapter");
+    }
+
+    #[test]
+    fn test_simplified_dependency_structure() {
+        let mut generator = AIBOMGenerator::new().unwrap();
+        
+        // Test that dependencies are now simple string arrays
+        let deps = vec!["pkg:huggingface/base-model@1.0".to_string(), "pkg:huggingface-dataset/dataset@1.0".to_string()];
+        generator.dependencies.insert("pkg:huggingface/test-model@1.0".to_string(), deps.clone());
+        
+        // Verify the structure
+        let stored_deps = generator.dependencies.get("pkg:huggingface/test-model@1.0").unwrap();
+        assert_eq!(stored_deps.len(), 2);
+        assert_eq!(stored_deps[0], "pkg:huggingface/base-model@1.0");
+        assert_eq!(stored_deps[1], "pkg:huggingface-dataset/dataset@1.0");
     }
 
     #[test]
