@@ -236,6 +236,29 @@ impl AIBOMGenerator {
                     println!("Found parent_model dependency: {}", parent_model_str);
                 }
             }
+
+            // Check for datasets used to train the model
+            if let Some(datasets) = card_data.get("datasets") {
+                if let Some(datasets_array) = datasets.as_array() {
+                    for dataset in datasets_array {
+                        if let Some(dataset_str) = dataset.as_str() {
+                            dependencies.push((dataset_str.to_string(), Some("train".to_string())));
+                            println!("Found training dataset dependency: {}", dataset_str);
+                        }
+                    }
+                } else if let Some(dataset_str) = datasets.as_str() {
+                    dependencies.push((dataset_str.to_string(), Some("train".to_string())));
+                    println!("Found training dataset dependency: {}", dataset_str);
+                }
+            }
+
+            // Also check for train_dataset field (alternative naming)
+            if let Some(train_dataset) = card_data.get("train_dataset") {
+                if let Some(dataset_str) = train_dataset.as_str() {
+                    dependencies.push((dataset_str.to_string(), Some("train".to_string())));
+                    println!("Found training dataset dependency: {}", dataset_str);
+                }
+            }
         }
 
         // Remove duplicates and self-references
@@ -420,6 +443,50 @@ impl AIBOMGenerator {
         None
     }
 
+    fn create_dataset_component(&self, dataset_id: &str) -> Component {
+        let (org, dataset_name) = self.extract_organization_from_dataset_id(dataset_id);
+        let version = "1.0".to_string();
+        let purl = format!("pkg:huggingface-dataset/{}@{}", dataset_id, version);
+        let bom_ref = purl.clone();
+
+        Component {
+            component_type: "data".to_string(),
+            bom_ref: bom_ref.clone(),
+            name: dataset_name.clone(),
+            version: Some(version.clone()),
+            description: Some("Training dataset".to_string()),
+            group: Some(org.clone()),
+            publisher: Some(org.clone()),
+            supplier: Some(Organization {
+                name: org.clone(),
+                url: Some(vec![format!("https://huggingface.co/datasets/{}", org)]),
+            }),
+            manufacturer: Some(Organization {
+                name: org.clone(),
+                url: Some(vec![format!("https://huggingface.co/datasets/{}", org)]),
+            }),
+            authors: Some(vec![Author { name: org.clone() }]),
+            copyright: Some("NOASSERTION".to_string()),
+            licenses: None, // Dataset license would need separate API call
+            external_references: Some(vec![ExternalReference {
+                ref_type: "website".to_string(),
+                url: format!("https://huggingface.co/datasets/{}", dataset_id),
+                comment: Some("Dataset repository".to_string()),
+            }]),
+            purl: Some(purl),
+            model_card: None,
+        }
+    }
+
+    fn extract_organization_from_dataset_id(&self, dataset_id: &str) -> (String, String) {
+        let parts: Vec<&str> = dataset_id.split('/').collect();
+        if parts.len() >= 2 {
+            (parts[0].to_string(), parts[1].to_string())
+        } else {
+            ("huggingface".to_string(), dataset_id.to_string())
+        }
+    }
+
     fn model_info_to_component(&self, model_info: &ModelInfo) -> Component {
         let (org, model_name) = self.extract_organization_from_model_id(&model_info.model_id);
         let version = "1.0".to_string();
@@ -552,27 +619,50 @@ impl AIBOMGenerator {
         let model_info = self.get_model_info(model_id)?;
         let dependencies = self.extract_dependencies(&model_info);
 
-        // Process dependent models
+        // Separate datasets from model dependencies
+        let mut dataset_dependencies = Vec::new();
+        let mut model_dependencies = Vec::new();
+
+        for (dep_id, relation) in &dependencies {
+            if relation.as_ref().map(|r| r.as_str()) == Some("train") {
+                dataset_dependencies.push((dep_id.clone(), relation.clone()));
+            } else {
+                model_dependencies.push((dep_id.clone(), relation.clone()));
+            }
+        }
+
+        // Process dataset dependencies
         let mut processed_dependencies = Vec::new();
-        for (dep_model, relation) in &dependencies {
-            if !self.processed_models.contains(dep_model) {
-                match self.process_model_recursively(dep_model) {
+        for (dataset_id, relation) in dataset_dependencies {
+            let dataset_component = self.create_dataset_component(&dataset_id);
+            let dep_purl = dataset_component.purl.clone().unwrap();
+
+            // Add dataset component to components list
+            self.components.push(dataset_component);
+            processed_dependencies.push((dep_purl, relation));
+            println!("Added dataset component: {}", dataset_id);
+        }
+
+        // Process model dependencies
+        for (dep_model, relation) in model_dependencies {
+            if !self.processed_models.contains(&dep_model) {
+                match self.process_model_recursively(&dep_model) {
                     Ok(_) => {
                         // Use the same PURL format
                         let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                        processed_dependencies.push((dep_purl, relation.clone()));
+                        processed_dependencies.push((dep_purl, relation));
                     }
                     Err(e) => {
                         println!("Warning: Failed to process dependency {}: {}", dep_model, e);
                         // Still add the dependency reference even if we couldn't fetch details
                         let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                        processed_dependencies.push((dep_purl, relation.clone()));
+                        processed_dependencies.push((dep_purl, relation));
                     }
                 }
             } else {
                 // Use the same PURL format
                 let dep_purl = format!("pkg:huggingface/{}@1.0", dep_model);
-                processed_dependencies.push((dep_purl, relation.clone()));
+                processed_dependencies.push((dep_purl, relation));
             }
         }
 
@@ -720,11 +810,63 @@ mod tests {
         };
 
         let dependencies = generator.extract_dependencies(&model_info);
-        assert!(dependencies.contains(&"microsoft/DialoGPT-base".to_string()));
+        // Note: This test may not pass as expected since we removed automatic dependency inference
+        // and now only extract explicit dependencies from card_data
+        assert_eq!(dependencies.len(), 0); // No card_data means no dependencies
     }
 
     #[test]
-    fn test_get_model_architecture_from_tags() {
+    fn test_extract_datasets_from_card_data() {
+        let generator = AIBOMGenerator::new().unwrap();
+
+        let card_data = json!({
+            "datasets": ["squad", "common_crawl", "openwebtext"]
+        });
+
+        let model_info = ModelInfo {
+            model_id: "test/model".to_string(),
+            tags: vec!["transformers".to_string()],
+            library_name: Some("transformers".to_string()),
+            created_at: None,
+            last_modified: None,
+            license: None,
+            card_data: Some(card_data),
+            siblings: None,
+            sha: None,
+        };
+
+        let dependencies = generator.extract_dependencies(&model_info);
+
+        // Check that datasets are extracted with "train" relation
+        assert!(dependencies.contains(&("squad".to_string(), Some("train".to_string()))));
+        assert!(dependencies.contains(&("common_crawl".to_string(), Some("train".to_string()))));
+        assert!(dependencies.contains(&("openwebtext".to_string(), Some("train".to_string()))));
+    }
+
+    #[test]
+    fn test_create_dataset_component() {
+        let generator = AIBOMGenerator::new().unwrap();
+        let dataset_component = generator.create_dataset_component("huggingface/squad");
+
+        assert_eq!(dataset_component.component_type, "data");
+        assert_eq!(dataset_component.name, "squad");
+        assert_eq!(dataset_component.group, Some("huggingface".to_string()));
+        assert!(
+            dataset_component
+                .purl
+                .as_ref()
+                .unwrap()
+                .contains("pkg:huggingface-dataset/huggingface/squad@1.0")
+        );
+        assert!(
+            dataset_component.external_references.as_ref().unwrap()[0]
+                .url
+                .contains("https://huggingface.co/datasets/huggingface/squad")
+        );
+    }
+
+    #[test]
+    fn test_get_model_architecture_default() {
         let generator = AIBOMGenerator::new().unwrap();
 
         let model_info = ModelInfo {
@@ -740,7 +882,8 @@ mod tests {
         };
 
         let architecture = generator.get_model_architecture(&model_info);
-        assert_eq!(architecture, "GPT2LMHeadModel");
+        // Without card_data, should return default architecture
+        assert_eq!(architecture, "TransformerModel");
     }
 
     #[test]
