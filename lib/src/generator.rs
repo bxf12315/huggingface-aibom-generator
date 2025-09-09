@@ -1,5 +1,5 @@
-use crate::*;
 use crate::models::dependency::DependencyReference;
+use crate::*;
 use std::collections::{HashMap, HashSet};
 
 pub struct AIBOMGenerator {
@@ -63,10 +63,11 @@ impl AIBOMGenerator {
         if let Some(card_data) = &model_info.card_data {
             // Check for explicit base_model field (can be string or array)
             if let Some(base_model) = card_data.get("base_model") {
-                let mut relation = card_data.get("base_model_relation")
+                let mut relation = card_data
+                    .get("base_model_relation")
                     .and_then(|r| r.as_str())
                     .map(|s| s.to_string());
-                
+
                 // If no explicit relation, try to infer from other fields
                 if relation.is_none() {
                     // Check library_name first (highest priority for specific model types)
@@ -75,15 +76,15 @@ impl AIBOMGenerator {
                             match lib_str {
                                 "adapter-transformers" | "adapters" => {
                                     relation = Some("adapter".to_string());
-                                },
+                                }
                                 "peft" => {
                                     relation = Some("lora".to_string());
-                                },
+                                }
                                 _ => {}
                             }
                         }
                     }
-                    
+
                     // Check for quantized_by field
                     if relation.is_none() {
                         if let Some(quantized_by) = card_data.get("quantized_by") {
@@ -92,12 +93,12 @@ impl AIBOMGenerator {
                             }
                         }
                     }
-                    
+
                     // Check tags for relation indicators
                     if relation.is_none() {
                         for tag in &model_info.tags {
                             let tag_lower = tag.to_lowercase();
-                            
+
                             // Check for base_model:relation:model format
                             if tag_lower.starts_with("base_model:") {
                                 let parts: Vec<&str> = tag_lower.split(':').collect();
@@ -106,27 +107,27 @@ impl AIBOMGenerator {
                                         "finetune" | "finetuned" => {
                                             relation = Some("finetuned".to_string());
                                             break;
-                                        },
+                                        }
                                         "adapter" => {
                                             relation = Some("adapter".to_string());
                                             break;
-                                        },
+                                        }
                                         "lora" | "qlora" => {
                                             relation = Some("lora".to_string());
                                             break;
-                                        },
+                                        }
                                         "quantized" | "quantization" => {
                                             relation = Some("quantized".to_string());
                                             break;
-                                        },
+                                        }
                                         "merged" | "merge" => {
                                             relation = Some("merged".to_string());
                                             break;
-                                        },
+                                        }
                                         "distilled" | "distillation" => {
                                             relation = Some("distilled".to_string());
                                             break;
-                                        },
+                                        }
                                         _ => {}
                                     }
                                 }
@@ -136,50 +137,58 @@ impl AIBOMGenerator {
                                     "lora" | "qlora" => {
                                         relation = Some("lora".to_string());
                                         break;
-                                    },
+                                    }
                                     "adapter" => {
                                         relation = Some("adapter".to_string());
                                         break;
-                                    },
+                                    }
                                     "instruction-tuning" | "chat" => {
                                         relation = Some("finetuned".to_string());
                                         break;
-                                    },
+                                    }
                                     "distillation" => {
                                         relation = Some("distilled".to_string());
                                         break;
-                                    },
+                                    }
                                     "onnx" | "tensorrt" => {
                                         relation = Some("converted".to_string());
                                         break;
-                                    },
+                                    }
                                     "pruning" => {
                                         relation = Some("pruned".to_string());
                                         break;
-                                    },
+                                    }
                                     _ => {}
                                 }
                             }
                         }
                     }
-                    
+
                     // Check for merge indicators (multiple base models or merge tags)
                     if relation.is_none() {
                         let is_merge = if let Some(base_model_array) = base_model.as_array() {
                             base_model_array.len() > 1
                         } else {
                             false
-                        } || model_info.tags.iter().any(|tag| tag.to_lowercase().contains("merge"));
-                        
+                        } || model_info
+                            .tags
+                            .iter()
+                            .any(|tag| tag.to_lowercase().contains("merge"));
+
                         if is_merge {
                             relation = Some("merged".to_string());
                         }
                     }
-                    
+
                     // Check model name patterns for common relations
                     if relation.is_none() {
                         let model_name = model_info.model_id.to_lowercase();
-                        if model_name.contains("gguf") || model_name.contains("gptq") || model_name.contains("awq") || model_name.contains("int4") || model_name.contains("int8") {
+                        if model_name.contains("gguf")
+                            || model_name.contains("gptq")
+                            || model_name.contains("awq")
+                            || model_name.contains("int4")
+                            || model_name.contains("int8")
+                        {
                             relation = Some("quantized".to_string());
                         } else if model_name.contains("lora") || model_name.contains("qlora") {
                             relation = Some("lora".to_string());
@@ -200,20 +209,26 @@ impl AIBOMGenerator {
                         }
                     }
                 }
-                
+
                 if let Some(base_model_str) = base_model.as_str() {
                     dependencies.push((base_model_str.to_string(), relation.clone()));
-                    println!("Found base_model dependency: {} (relation: {:?})", base_model_str, relation);
+                    println!(
+                        "Found base_model dependency: {} (relation: {:?})",
+                        base_model_str, relation
+                    );
                 } else if let Some(base_model_array) = base_model.as_array() {
                     for base_model_item in base_model_array {
                         if let Some(base_model_str) = base_model_item.as_str() {
                             dependencies.push((base_model_str.to_string(), relation.clone()));
-                            println!("Found base_model dependency: {} (relation: {:?})", base_model_str, relation);
+                            println!(
+                                "Found base_model dependency: {} (relation: {:?})",
+                                base_model_str, relation
+                            );
                         }
                     }
                 }
             }
-            
+
             // Check for parent_model field (some models use this)
             if let Some(parent_model) = card_data.get("parent_model") {
                 if let Some(parent_model_str) = parent_model.as_str() {
@@ -230,7 +245,10 @@ impl AIBOMGenerator {
 
         // Log warning if no dependencies found
         if dependencies.is_empty() {
-            println!("Warning: No explicit dependencies found for model: {}. Consider adding base_model, parent_model, or dependencies fields to the model card.", model_info.model_id);
+            println!(
+                "Warning: No explicit dependencies found for model: {}. Consider adding base_model, parent_model, or dependencies fields to the model card.",
+                model_info.model_id
+            );
         }
 
         dependencies
@@ -385,17 +403,6 @@ impl AIBOMGenerator {
             }
         }
 
-        // Check tags for architecture information
-        for tag in &model_info.tags {
-            if tag.contains("gpt2") || tag.contains("gpt") {
-                return "GPT2LMHeadModel".to_string();
-            } else if tag.contains("bert") {
-                return "BertModel".to_string();
-            } else if tag.contains("t5") {
-                return "T5ForConditionalGeneration".to_string();
-            }
-        }
-
         // Default to generic transformer if no specific architecture found
         "TransformerModel".to_string()
     }
@@ -416,7 +423,9 @@ impl AIBOMGenerator {
         let bom_ref = purl.clone();
 
         // Extract license from tags if not available in license field
-        let license_str = model_info.license.clone()
+        let license_str = model_info
+            .license
+            .clone()
             .or_else(|| self.extract_license_from_tags(&model_info.tags));
 
         // Create ModelCard
@@ -590,11 +599,14 @@ impl AIBOMGenerator {
             .iter()
             .map(|(model_ref, deps)| Dependency {
                 reference: model_ref.clone(),
-                depends_on: deps.iter().map(|(dep_ref, relation)| DependencyReference {
-                    reference: dep_ref.clone(),
-                    relation: relation.clone(),
-                    scope: Some("required".to_string()),
-                }).collect(),
+                depends_on: deps
+                    .iter()
+                    .map(|(dep_ref, relation)| DependencyReference {
+                        reference: dep_ref.clone(),
+                        relation: relation.clone(),
+                        scope: Some("required".to_string()),
+                    })
+                    .collect(),
             })
             .collect();
 
@@ -675,14 +687,14 @@ mod tests {
     #[test]
     fn test_extract_license_from_tags() {
         let generator = AIBOMGenerator::new().unwrap();
-        
+
         let tags = vec![
             "transformers".to_string(),
             "pytorch".to_string(),
             "license:mit".to_string(),
             "text-generation".to_string(),
         ];
-        
+
         let license = generator.extract_license_from_tags(&tags);
         assert_eq!(license, Some("mit".to_string()));
     }
@@ -690,7 +702,7 @@ mod tests {
     #[test]
     fn test_extract_dependencies_dialogpt() {
         let generator = AIBOMGenerator::new().unwrap();
-        
+
         let model_info = ModelInfo {
             model_id: "microsoft/DialoGPT-medium".to_string(),
             tags: vec!["transformers".to_string(), "gpt2".to_string()],
@@ -702,7 +714,7 @@ mod tests {
             siblings: None,
             sha: None,
         };
-        
+
         let dependencies = generator.extract_dependencies(&model_info);
         assert!(dependencies.contains(&"microsoft/DialoGPT-base".to_string()));
     }
@@ -710,7 +722,7 @@ mod tests {
     #[test]
     fn test_get_model_architecture_from_tags() {
         let generator = AIBOMGenerator::new().unwrap();
-        
+
         let model_info = ModelInfo {
             model_id: "microsoft/DialoGPT-medium".to_string(),
             tags: vec!["transformers".to_string(), "gpt2".to_string()],
@@ -722,7 +734,7 @@ mod tests {
             siblings: None,
             sha: None,
         };
-        
+
         let architecture = generator.get_model_architecture(&model_info);
         assert_eq!(architecture, "GPT2LMHeadModel");
     }
@@ -730,12 +742,12 @@ mod tests {
     #[test]
     fn test_get_model_architecture_from_card_data() {
         let generator = AIBOMGenerator::new().unwrap();
-        
+
         let card_data = json!({
             "architectures": ["GPT2LMHeadModel"],
             "model_type": "gpt2"
         });
-        
+
         let model_info = ModelInfo {
             model_id: "microsoft/DialoGPT-medium".to_string(),
             tags: vec!["transformers".to_string()],
@@ -747,7 +759,7 @@ mod tests {
             siblings: None,
             sha: None,
         };
-        
+
         let architecture = generator.get_model_architecture(&model_info);
         assert_eq!(architecture, "GPT2LMHeadModel");
     }
